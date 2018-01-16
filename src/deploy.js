@@ -1,17 +1,20 @@
 const AWS = require('aws-sdk')
+const yaml = require('js-yaml')
 const spawnAsync = require('./spawn-async')
 const { spawn } = require('child_process')
-const { unlink } = require('fs')
-const { join } = require('path')
+const { readFileSync, unlink } = require('fs')
+const { join, extname } = require('path')
 const { promisify } = require('util')
 const delteFileAsync = promisify(unlink)
 
 // TODO: Ideally use the AWS node SDK but `cloudformation package` and `cloudformation deploy`
 // are complex custom commands only available in the AWS CLI.
 
-async function cloudformationPackage(templateFile, templateFilePackaged, s3BucketName) {
+async function cloudformationPackage(templateFile, templateFilePackaged, useJson, s3BucketName) {
   return spawnAsync(
-    `aws cloudformation package --template-file ${templateFile} --output-template-file ${templateFilePackaged} --s3-bucket ${s3BucketName} --use-json`
+    `aws cloudformation package --template-file ${templateFile} --output-template-file ${templateFilePackaged} --s3-bucket ${s3BucketName} ${
+      useJson ? '--use-json' : ''
+    }`
   )
 }
 
@@ -37,14 +40,19 @@ async function getApiUrl(stackName, region = 'us-east-1', stage = 'Prod') {
 
 async function deploy(input) {
   const templateFile = join(process.cwd(), input.template || 'sam.json')
-  const templateFilePackaged = templateFile.replace(/\.json$/, '-packaged.json')
-  const template = require(templateFile)
+  const templateExtension = extname(templateFile)
+  const useJson = templateExtension === '.json'
+  const templateFilePackaged = templateFile.replace(
+    new RegExp(templateExtension + '$', 'i'),
+    '-packaged' + templateExtension
+  )
+  const template = useJson ? require(templateFile) : yaml.safeLoad(readFileSync(templateFile, 'utf8'))
   const { Parameters } = template
   const s3BucketName = Parameters.BucketName.Default
   const stackName = Parameters.StackName.Default
   try {
     await createS3Bucket(s3BucketName)
-    await cloudformationPackage(templateFile, templateFilePackaged, s3BucketName)
+    await cloudformationPackage(templateFile, templateFilePackaged, useJson, s3BucketName)
     await cloudformationDeploy(templateFilePackaged, stackName)
     delteFileAsync(templateFilePackaged)
     const apiUrl = await getApiUrl(stackName)

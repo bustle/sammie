@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk')
+const yaml = require('js-yaml')
 const samTemplate = require('./templates/sam-template')
 const lambdaTemplate = require('./templates/lambda-template')
 const { promisify } = require('util')
@@ -11,7 +12,7 @@ async function getAccountId() {
   return data.Account
 }
 
-async function makeSamTemplate(name) {
+async function makeSamTemplate(name, opts) {
   const accountId = await getAccountId()
   const template = JSON.parse(JSON.stringify(samTemplate))
   const { Resources, Parameters } = template
@@ -22,8 +23,9 @@ async function makeSamTemplate(name) {
   Parameters.StackName.Default = `${name}-stack`
   delete Resources.__RESOURCE_NAME__
 
-  const path = 'sam.json'
-  const content = JSON.stringify(template, null, 2) + '\n'
+  const useYaml = opts.yaml
+  const path = `sam.${useYaml ? 'yaml' : 'json'}`
+  const content = useYaml ? yaml.safeDump(template) : JSON.stringify(template, null, 2) + '\n'
   await writeFileAsync(path, content)
   return path
 }
@@ -35,8 +37,8 @@ async function makeLambda(name) {
   return path
 }
 
-async function init(name) {
-  return Promise.all([makeSamTemplate(name), makeLambda(name)])
+async function init(name, opts) {
+  return Promise.all([makeSamTemplate(name, opts), makeLambda(name)])
     .then(files => console.log('SAM files created:', ...files)) // eslint-disable-line no-console
     .catch(e => console.log(e.message)) // eslint-disable-line no-console
 }
