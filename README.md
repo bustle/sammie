@@ -22,11 +22,20 @@ sammie deploy
 
 This will initialize a basic SAM template, deploy it, and open a browser with your function served over https!
 
+### Commands
+
+`sammie init <name>`: Initialize a SAM project with a project <name>  
+Options:  
+`-y, --yaml`: Generate yaml for SAM template. Defaults to json, because javascript.
+
+`sammie deploy`: Deploy a SAM project  
+Options:  
+`-t, --template` Path to the SAM template. Defaults to `sam.json` in the current directory.
+
 ### Bootstrapping existing SAM projects
 
-If you already have a SAM template, you can simply use `sammie deploy` for a simplified deployment.
-By default, it looks for the template at `sam.json`. You can adjust this with `sammie deploy --template ./src/config/aws-sam.json`
-Make sure to add the following `Parameters` to your template so it knows where to deploy:
+If you already have a SAM template, you can use `sammie deploy` for a simplified deployment.
+Make sure to the following `Parameters` to your template so sammie knows where to deploy:
 
 ```json
 "Parameters": {

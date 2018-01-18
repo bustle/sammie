@@ -1,6 +1,6 @@
 {
   "name": "sammie",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Serverless Application Model Made Infinitely Easier™",
   "license": "MIT",
   "author": "Garth Poitras <garth22@gmail.com>",
@@ -17,12 +17,16 @@
   ],
   "main": "src/index.js",
   "bin": "src/bin.js",
+  "engines": {
+    "node": ">=7.6"
+  },
   "scripts": {
-    "clean": "rm index.js | rm sam.json",
+    "clean": "rm -f index.js | rm -f sam.json | rm -f sam.yaml",
     "test": "flt all -r"
   },
   "dependencies": {
-    "aws-sdk": "^2.181.0",
+    "aws-sdk": "^2.184.0",
+    "js-yaml": "^3.10.0",
     "sade": "^1.3.1"
   },
   "devDependencies": {
