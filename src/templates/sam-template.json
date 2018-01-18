@@ -26,11 +26,18 @@
         "MemorySize": 128,
         "Timeout": 3,
         "Events": {
-          "GetResource": {
+          "ApiRequestRoot": {
             "Type": "Api",
             "Properties": {
               "Path": "/",
-              "Method": "get"
+              "Method": "ANY"
+            }
+          },
+          "ApiRequestProxy": {
+            "Type": "Api",
+            "Properties": {
+              "Path": "/{proxy+}",
+              "Method": "ANY"
             }
           }
         }
