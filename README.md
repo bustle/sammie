@@ -24,18 +24,18 @@ This will initialize a basic SAM template, deploy it, and open a browser with yo
 
 ### Commands
 
-`sammie init <name>`: Initialize a SAM project with a project <name>
-Options:
+`sammie init <name>`: Initialize a SAM project with a project <name>  
+Options:  
 `-y, --yaml`: Generate yaml for SAM template. Defaults to json, because javascript.
 
-`sammie deploy`: Deploy a SAM project
-Options:
+`sammie deploy`: Deploy a SAM project  
+Options:  
 `-t, --template` Path to the SAM template. Defaults to `sam.json` in the current directory.
 
 ### Bootstrapping existing SAM projects
 
 If you already have a SAM template, you can use `sammie deploy` for a simplified deployment.
-Make sure to add a s3 bucket and stack name `Parameters` to your template so sammie knows where to deploy:
+Make sure to the following `Parameters` to your template so sammie knows where to deploy:
 
 ```json
 "Parameters": {
