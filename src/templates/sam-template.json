@@ -43,5 +43,10 @@
         }
       }
     }
+  },
+
+  "Outputs": {
+    "Region": { "Value" : { "Ref" : "AWS::Region" } }, 
+    "ApiId": { "Value": { "Ref": "ServerlessRestApi" } }
   }
 }

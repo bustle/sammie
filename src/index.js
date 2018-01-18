@@ -22,4 +22,6 @@ cli
   .example('deploy --template ./config/template.json')
   .action(deploy)
 
+process.on('unhandledRejection', error => console.log('[sammie]', error)) // eslint-disable-line no-console
+
 module.exports = cli
