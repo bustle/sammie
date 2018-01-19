@@ -1,10 +1,8 @@
 const AWS = require('aws-sdk')
 const yaml = require('js-yaml')
+const { pascalCaseString, writeFileAsync } = require('./utils')
 const samTemplate = require('./templates/sam-template')
 const lambdaTemplate = require('./templates/lambda-template')
-const { promisify } = require('util')
-const { writeFile } = require('fs')
-const writeFileAsync = promisify(writeFile)
 
 async function getAccountId() {
   const sts = new AWS.STS()
@@ -12,11 +10,11 @@ async function getAccountId() {
   return data.Account
 }
 
-async function makeSamTemplate(name, opts) {
+async function makeSam(name, opts) {
   const accountId = await getAccountId()
   const template = JSON.parse(JSON.stringify(samTemplate))
   const { Resources, Parameters } = template
-  const resourceName = `${name.charAt(0).toUpperCase() + name.slice(1).replace(/[\W_]+/g, '')}Function`
+  const resourceName = pascalCaseString(name) + 'Function'
   const resource = (Resources[resourceName] = Resources.__RESOURCE_NAME__)
   resource.Properties.FunctionName = name
   Parameters.BucketName.Default = `sam-uploads-${accountId}`
@@ -38,9 +36,10 @@ async function makeLambda(name) {
 }
 
 async function init(name, opts) {
-  return Promise.all([makeSamTemplate(name, opts), makeLambda(name)])
-    .then(files => console.log('[sammie] created files:\n', files.join(' \n '))) // eslint-disable-line no-console
-    .catch(e => console.log(e.message)) // eslint-disable-line no-console
+  const sam = makeSam(name, opts)
+  const lambda = makeLambda(name)
+  const files = [await sam, await lambda]
+  console.log('[sammie] created files:\n', files.join(' \n ')) // eslint-disable-line no-console
 }
 
 module.exports = init
