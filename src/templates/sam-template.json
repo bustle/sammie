@@ -11,6 +11,10 @@
     "BucketName": {
       "Type": "String",
       "Default": "__BUCKET_NAME__"
+    },
+    "Stage": {
+      "Type": "String",
+      "Default": "Prod"
     }
   },
 
@@ -46,7 +50,8 @@
   },
 
   "Outputs": {
-    "Region": { "Value" : { "Ref" : "AWS::Region" } }, 
-    "ApiId": { "Value": { "Ref": "ServerlessRestApi" } }
+    "Region": { "Value": { "Ref": "AWS::Region" } },
+    "ApiId": { "Value": { "Ref": "ServerlessRestApi" } },
+    "Stage": { "Value": { "Ref": "Stage" } }
   }
 }
