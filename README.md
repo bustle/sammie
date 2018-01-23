@@ -24,13 +24,14 @@ This will initialize a basic SAM template, deploy it, and open a browser with yo
 
 ### Commands
 
-`sammie init <name>`: Initialize a SAM project with a name
+`sammie init <name>`: Initialize a SAM project with a name  
 Options:  
 `-y, --yaml`: Generate yaml for SAM template. Defaults to json, because javascript.
 
 `sammie deploy`: Deploy a SAM project  
 Options:  
-`-t, --template` Path to the SAM template. Defaults to `sam.json` in the current directory.
+`-t, --template`: Path to the SAM template. Defaults to `sam.json` in the current directory.
+`-p, --parameters`: A list of parameters to override in your template.
 
 ### Bootstrapping existing SAM projects
 

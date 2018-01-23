@@ -19,12 +19,13 @@ async function packageProject(templatePath, templatePathPkg, s3BucketName, useJs
   )
 }
 
-async function deployStack(templatePathPkg, stackName) {
+async function deployStack(templatePathPkg, stackName, parameters) {
   return spawnAsync(
     `aws cloudformation deploy ` +
       `--template-file ${templatePathPkg} ` +
       `--stack-name ${stackName} ` +
-      `--capabilities CAPABILITY_IAM`
+      `--capabilities CAPABILITY_IAM ` +
+      `${parameters ? '--parameter-overrides ' + parameters.join(' ') : ''}`
   )
 }
 
@@ -42,10 +43,11 @@ async function getStackOutputs(stackName) {
   return outputs
 }
 
-async function getApiUrl(stackName) {
-  const { ApiId, Region } = await getStackOutputs(stackName)
-  if (ApiId && Region) {
-    return `https://${ApiId}.execute-api.${Region}.amazonaws.com/Prod`
+async function launchProject(stackName) {
+  const { ApiId, Region, Stage } = await getStackOutputs(stackName)
+  if (ApiId && Region && Stage) {
+    const apiUrl = `https://${ApiId}.execute-api.${Region}.amazonaws.com/${Stage}`
+    spawnAsync(`open ${apiUrl}`)
   }
 }
 
@@ -59,12 +61,9 @@ async function deploy(input) {
   const stackName = template.Parameters.StackName.Default
   await createS3Bucket(s3BucketName)
   await packageProject(templatePath, templatePathPkg, s3BucketName, useJson)
-  await deployStack(templatePathPkg, stackName)
+  await deployStack(templatePathPkg, stackName, input.parameters)
   delteFileAsync(templatePathPkg)
-  const apiUrl = await getApiUrl(stackName)
-  if (apiUrl) {
-    spawnAsync(`open ${apiUrl}`)
-  }
+  launchProject(stackName)
 }
 
 module.exports = deploy
