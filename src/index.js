@@ -2,6 +2,10 @@ const sade = require('sade')
 const pkg = require('../package')
 const init = require('./init')
 const deploy = require('./deploy')
+const { log } = require('./utils')
+
+process.env.AWS_SDK_LOAD_CONFIG = true
+process.on('unhandledRejection', log)
 
 const cli = sade(pkg.name)
 
@@ -22,7 +26,5 @@ cli
   .example('deploy')
   .example('deploy --template ./config/template.json --parameters Stage=testing --parameters foo=bar')
   .action(deploy)
-
-process.on('unhandledRejection', error => console.log('[sammie]', error)) // eslint-disable-line no-console
 
 module.exports = cli
