@@ -2,14 +2,13 @@ const { readFileSync } = require('fs')
 const { join, extname } = require('path')
 const AWS = require('aws-sdk')
 const yaml = require('js-yaml')
-const { spawnAsync, delteFileAsync } = require('./utils')
-
-process.env.AWS_SDK_LOAD_CONFIG = true
+const { spawnAsync, delteFileAsync, log } = require('./utils')
 
 // TODO: Use the nodejs SDK instead of `cloudformation package`, `cloudformation deploy`
 // https://github.com/gpoitch/sammie/issues/1
 
 async function packageProject(templatePath, templatePathPkg, s3BucketName, useJson) {
+  log('packaging:', templatePath)
   return spawnAsync(
     `aws cloudformation package ` +
       `--template-file ${templatePath} ` +
@@ -20,6 +19,7 @@ async function packageProject(templatePath, templatePathPkg, s3BucketName, useJs
 }
 
 async function deployStack(templatePathPkg, stackName, parameters) {
+  log('deploying:', stackName)
   return spawnAsync(
     `aws cloudformation deploy ` +
       `--template-file ${templatePathPkg} ` +

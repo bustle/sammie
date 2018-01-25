@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk')
 const yaml = require('js-yaml')
-const { pascalCaseString, writeFileAsync } = require('./utils')
+const { pascalCaseString, writeFileAsync, log } = require('./utils')
 const samTemplate = require('./templates/sam-template')
 const lambdaTemplate = require('./templates/lambda-template')
 
@@ -39,7 +39,7 @@ async function init(name, opts) {
   const sam = makeSam(name, opts)
   const lambda = makeLambda(name)
   const files = [await sam, await lambda]
-  console.log('[sammie] created files:\n', files.join(' \n ')) // eslint-disable-line no-console
+  log('created files:\n', files.join(' \n '))
 }
 
 module.exports = init

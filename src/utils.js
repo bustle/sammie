@@ -2,6 +2,10 @@ const { spawn } = require('child_process')
 const { writeFile, unlink } = require('fs')
 const { promisify } = require('util')
 
+function log(...args) {
+  console.log('\n', '[sammie]', ...args, '\n') // eslint-disable-line no-console
+}
+
 async function spawnAsync(command) {
   const child = spawn(command, { shell: true, stdio: 'inherit' })
   return new Promise((resolve, reject) => {
@@ -18,4 +22,4 @@ function pascalCaseString(string) {
 const writeFileAsync = promisify(writeFile)
 const delteFileAsync = promisify(unlink)
 
-module.exports = { spawnAsync, pascalCaseString, writeFileAsync, delteFileAsync }
+module.exports = { log, spawnAsync, pascalCaseString, writeFileAsync, delteFileAsync }
