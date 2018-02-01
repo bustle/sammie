@@ -22,9 +22,10 @@ cli
   .command('deploy')
   .describe('Deploy a SAM project')
   .option('-t, --template', 'Path to the SAM template. Defaults to `sam.json` in the current directory.')
+  .option('-e, --environment', 'An environment name to deploy. Defaults to development.')
   .option('-p, --parameters', 'A list of parameters to override in your template.')
   .example('deploy')
-  .example('deploy --template ./config/template.json --parameters Stage=testing --parameters foo=bar')
+  .example('deploy --template ./config/template.json --environment production --parameters foo=bar')
   .action(deploy)
 
 module.exports = cli

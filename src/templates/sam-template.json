@@ -1,57 +1,72 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
-  "Description": "",
 
   "Parameters": {
-    "StackName": {
-      "Type": "String",
-      "Default": "__STACK_NAME__"
-    },
-    "BucketName": {
-      "Type": "String",
-      "Default": "__BUCKET_NAME__"
-    },
-    "Stage": {
-      "Type": "String",
-      "Default": "Prod"
-    }
+    "stackName": { "Type": "String" },
+    "bucketName": { "Type": "String" },
+    "environment": { "Type": "String", "Default": "development" }
   },
 
   "Resources": {
-    "__RESOURCE_NAME__": {
+    "__NAME__Function": {
       "Type": "AWS::Serverless::Function",
       "Properties": {
-        "FunctionName": "__FUNCTION_NAME__",
-        "Description": "",
+        "FunctionName": { "Fn::Sub": "${stackName}-${environment}" },
         "CodeUri": "index.js",
         "Handler": "index.handler",
         "Runtime": "nodejs6.10",
         "MemorySize": 128,
-        "Timeout": 3,
-        "Events": {
-          "ApiRequestRoot": {
-            "Type": "Api",
-            "Properties": {
-              "Path": "/",
-              "Method": "ANY"
-            }
+        "Timeout": 3
+      }
+    },
+
+    "__NAME__Api": {
+      "Type": "AWS::Serverless::Api",
+      "Properties": {
+        "StageName": { "Ref": "environment" },
+        "DefinitionBody": {
+          "swagger": "2.0",
+          "info": {
+            "title": { "Fn::Sub": "${stackName}-${environment}" }
           },
-          "ApiRequestProxy": {
-            "Type": "Api",
-            "Properties": {
-              "Path": "/{proxy+}",
-              "Method": "ANY"
+          "paths": {
+            "/": {
+              "x-amazon-apigateway-any-method": {
+                "x-amazon-apigateway-integration": {
+                  "type": "aws_proxy",
+                  "httpMethod": "POST",
+                  "uri": { "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__NAME__Function.Arn}/invocations" }
+                }
+              }
+            },
+            "/{proxy+}": {
+              "x-amazon-apigateway-any-method": {
+                "x-amazon-apigateway-integration": {
+                  "type": "aws_proxy",
+                  "httpMethod": "POST",
+                  "uri": { "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__NAME__Function.Arn}/invocations" }
+                }
+              }
             }
           }
         }
+      }
+    },
+
+    "__NAME__Permission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": { "Ref": "__NAME__Function" },
+        "Principal": "apigateway.amazonaws.com"
       }
     }
   },
 
   "Outputs": {
-    "Region": { "Value": { "Ref": "AWS::Region" } },
-    "ApiId": { "Value": { "Ref": "ServerlessRestApi" } },
-    "Stage": { "Value": { "Ref": "Stage" } }
+    "region": { "Value": { "Ref": "AWS::Region" } },
+    "apiId": { "Value": { "Ref": "__NAME__Api" } },
+    "environment": { "Value": { "Ref": "environment" } }
   }
 }
