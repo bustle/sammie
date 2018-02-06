@@ -1,10 +1,14 @@
-## SAMMIE - Serverless Application Model Made Infinitely Easier™
+## SAMMIE - Serverless Application Model Made Infinitely Easier
 
-[AWS Serverless Application Model (SAM)](https://github.com/awslabs/serverless-application-model) is an official way to define serverless applications provided by AWS.
+[AWS's Serverless Application Model (SAM)](https://github.com/awslabs/serverless-application-model) is the official AWS provided way to define serverless applications. sammie's purpose is to get you set up and deployed in seconds _using SAM_.
 
-sammie's purpose is to get you set up and deployed in seconds _using SAM_. sammie's only features are to automatically generate a minimal SAM template for you and simplify SAM's deploy steps into a single command. You can then utilize the official SAM docs to modify your application's resources.
+### Features
 
-![sammie](https://user-images.githubusercontent.com/411908/34999126-f03ae462-faae-11e7-9003-41b2f000cf33.gif)
+* Generate a minimal SAM template for you with a lambda function, api, and permissions.
+* Simplify SAM's multiple deploy steps into a single command.
+* Provide a best practice for deploying different environments as separate, reproducable stacks.
+
+![sammie](https://user-images.githubusercontent.com/411908/35882654-ea43468a-0b52-11e8-9a0c-d5d721e56a51.gif)
 
 ### Prerequisites
 
