@@ -2,10 +2,11 @@ const sade = require('sade')
 const pkg = require('../package')
 const init = require('./init')
 const deploy = require('./deploy')
-const { log } = require('./utils')
 
 process.env.AWS_SDK_LOAD_CONFIG = true
-process.on('unhandledRejection', log)
+process.on('unhandledRejection', e => {
+  throw e
+})
 
 const cli = sade(pkg.name)
 
