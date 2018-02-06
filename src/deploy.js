@@ -7,26 +7,29 @@ const { spawnAsync, delteFileAsync, log } = require('./utils')
 // TODO: Use the nodejs SDK instead of `cloudformation package`, `cloudformation deploy`
 // https://github.com/gpoitch/sammie/issues/1
 
-async function packageProject(templatePath, templatePathPkg, s3BucketName, useJson) {
-  log('packaging:', templatePath)
-  return spawnAsync(
+async function packageProject(templatePath, templatePathPkg, bucketName, useJson) {
+  const command =
     `aws cloudformation package ` +
-      `--template-file ${templatePath} ` +
-      `--output-template-file ${templatePathPkg} ` +
-      `--s3-bucket ${s3BucketName} ` +
-      `${useJson ? '--use-json' : ''}`
-  )
+    `--template-file ${templatePath} ` +
+    `--output-template-file ${templatePathPkg} ` +
+    `--s3-bucket ${bucketName} ` +
+    `${useJson ? '--use-json' : ''}`
+
+  log('Packaging:', templatePath, '-->', templatePathPkg)
+  return spawnAsync(command)
 }
 
 async function deployStack(templatePathPkg, stackName, parameters) {
-  log('deploying:', stackName)
-  return spawnAsync(
+  const parametersFlag = parameters && parameters.length && parameters.join(' ')
+  const command =
     `aws cloudformation deploy ` +
-      `--template-file ${templatePathPkg} ` +
-      `--stack-name ${stackName} ` +
-      `--capabilities CAPABILITY_IAM ` +
-      `${parameters ? '--parameter-overrides ' + parameters.join(' ') : ''}`
-  )
+    `--template-file ${templatePathPkg} ` +
+    `--stack-name ${stackName} ` +
+    `--capabilities CAPABILITY_IAM ` +
+    `${parametersFlag ? '--parameter-overrides ' + parametersFlag : ''}`
+
+  log('Deploying', parametersFlag ? `\n parameters: ${parametersFlag}` : '')
+  return spawnAsync(command)
 }
 
 async function createS3Bucket(bucketName) {
@@ -44,9 +47,9 @@ async function getStackOutputs(stackName) {
 }
 
 async function launchProject(stackName) {
-  const { ApiId, Region, Stage } = await getStackOutputs(stackName)
-  if (ApiId && Region && Stage) {
-    const apiUrl = `https://${ApiId}.execute-api.${Region}.amazonaws.com/${Stage}`
+  const { apiId, region, environment } = await getStackOutputs(stackName)
+  if (apiId && region && environment) {
+    const apiUrl = `https://${apiId}.execute-api.${region}.amazonaws.com/${environment}`
     spawnAsync(`open ${apiUrl}`)
   }
 }
@@ -56,12 +59,16 @@ async function deploy(input) {
   const templateExt = extname(templatePath)
   const templatePathPkg = templatePath.replace(new RegExp(templateExt + '$'), '-packaged' + templateExt)
   const useJson = templateExt === '.json'
-  const template = useJson ? require(templatePath) : yaml.safeLoad(readFileSync(templatePath, 'utf8'))
-  const s3BucketName = template.Parameters.BucketName.Default
-  const stackName = template.Parameters.StackName.Default
-  await createS3Bucket(s3BucketName)
-  await packageProject(templatePath, templatePathPkg, s3BucketName, useJson)
-  await deployStack(templatePathPkg, stackName, input.parameters)
+  const templateJson = useJson ? require(templatePath) : yaml.safeLoad(readFileSync(templatePath, 'utf8'))
+  const templateParams = templateJson.Parameters
+  const bucketName = templateParams.bucketName.Default
+  const environment =
+    input.environment || (templateParams.environment && templateParams.environment.Default) || 'development'
+  const stackName = `${templateParams.stackName.Default}-${environment}`
+  const deployParams = [].concat(input.parameters || [], `environment=${environment}`)
+  await createS3Bucket(bucketName)
+  await packageProject(templatePath, templatePathPkg, bucketName, useJson)
+  await deployStack(templatePathPkg, stackName, deployParams)
   delteFileAsync(templatePathPkg)
   launchProject(stackName)
 }

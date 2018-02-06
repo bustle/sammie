@@ -2,8 +2,10 @@ const { spawn } = require('child_process')
 const { writeFile, unlink } = require('fs')
 const { promisify } = require('util')
 
+const formatInfo = '\x1b[36m'
+const formatReset = '\x1b[0m'
 function log(...args) {
-  console.log('\n', '[sammie]', ...args, '\n') // eslint-disable-line no-console
+  console.log('\n', `${formatInfo}[sammie]${formatReset}`, ...args, '\n') // eslint-disable-line no-console
 }
 
 async function spawnAsync(command) {
@@ -14,7 +16,11 @@ async function spawnAsync(command) {
   })
 }
 
-function pascalCaseString(string) {
+function stackSafeName(string) {
+  return string.trim().replace(/[^a-z0-9]/gi, '-')
+}
+
+function resourceSafeName(string) {
   const pascaledString = string.replace(/(-|_|\.|\s)+(.)?/g, (m, s, c) => (c ? c.toUpperCase() : ''))
   return pascaledString.charAt(0).toUpperCase() + pascaledString.slice(1)
 }
@@ -22,4 +28,4 @@ function pascalCaseString(string) {
 const writeFileAsync = promisify(writeFile)
 const delteFileAsync = promisify(unlink)
 
-module.exports = { log, spawnAsync, pascalCaseString, writeFileAsync, delteFileAsync }
+module.exports = { log, spawnAsync, stackSafeName, resourceSafeName, writeFileAsync, delteFileAsync }

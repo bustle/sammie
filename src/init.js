@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk')
 const yaml = require('js-yaml')
-const { pascalCaseString, writeFileAsync, log } = require('./utils')
+const { resourceSafeName, stackSafeName, writeFileAsync, log } = require('./utils')
 const samTemplate = require('./templates/sam-template')
 const lambdaTemplate = require('./templates/lambda-template')
 
@@ -12,17 +12,12 @@ async function getAccountId() {
 
 async function makeSam(name, opts) {
   const accountId = await getAccountId()
-  const template = JSON.parse(JSON.stringify(samTemplate))
-  const { Resources, Parameters } = template
-  const resourceName = pascalCaseString(name) + 'Function'
-  const resource = (Resources[resourceName] = Resources.__RESOURCE_NAME__)
-  resource.Properties.FunctionName = name
-  Parameters.BucketName.Default = `sam-uploads-${accountId}`
-  Parameters.StackName.Default = `${name}-stack`
-  delete Resources.__RESOURCE_NAME__
-
   const useYaml = opts.yaml
   const path = `sam.${useYaml ? 'yaml' : 'json'}`
+  const templateString = JSON.stringify(samTemplate).replace(/__NAME__/g, resourceSafeName(name))
+  const template = JSON.parse(templateString)
+  template.Parameters.bucketName.Default = `sam-uploads-${accountId}`
+  template.Parameters.stackName.Default = name
   const content = useYaml ? yaml.safeDump(template) : JSON.stringify(template, null, 2) + '\n'
   await writeFileAsync(path, content)
   return path
@@ -36,10 +31,11 @@ async function makeLambda(name) {
 }
 
 async function init(name, opts) {
-  const sam = makeSam(name, opts)
-  const lambda = makeLambda(name)
+  const stackName = stackSafeName(name)
+  const sam = makeSam(stackName, opts)
+  const lambda = makeLambda(stackName)
   const files = [await sam, await lambda]
-  log('created files:\n', files.join(' \n '))
+  log(`Created "${stackName}" with files:\n`, files.join(' \n '))
 }
 
 module.exports = init
