@@ -46,11 +46,10 @@ async function getStackOutputs(stackName) {
   return outputs
 }
 
-async function launchProject(stackName) {
+async function getEndpointUrl(stackName) {
   const { apiId, region, environment } = await getStackOutputs(stackName)
   if (apiId && region && environment) {
-    const apiUrl = `https://${apiId}.execute-api.${region}.amazonaws.com/${environment}`
-    spawnAsync(`open ${apiUrl}`)
+    return `https://${apiId}.execute-api.${region}.amazonaws.com/${environment}`
   }
 }
 
@@ -70,7 +69,8 @@ async function deploy(input) {
   await packageProject(templatePath, templatePathPkg, bucketName, useJson)
   await deployStack(templatePathPkg, stackName, deployParams)
   delteFileAsync(templatePathPkg)
-  launchProject(stackName)
+  const url = await getEndpointUrl(stackName)
+  log('Deploy success ✔︎', url ? `\n ${url}` : '')
 }
 
 module.exports = deploy
