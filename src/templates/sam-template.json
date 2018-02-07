@@ -12,7 +12,7 @@
     "__NAME__Function": {
       "Type": "AWS::Serverless::Function",
       "Properties": {
-        "FunctionName": { "Fn::Sub": "${stackName}-${environment}" },
+        "FunctionName": { "Ref": "AWS::StackName" },
         "CodeUri": "index.js",
         "Handler": "index.handler",
         "Runtime": "nodejs6.10",
@@ -28,7 +28,7 @@
         "DefinitionBody": {
           "swagger": "2.0",
           "info": {
-            "title": { "Fn::Sub": "${stackName}-${environment}" }
+            "title": { "Ref": "AWS::StackName" }
           },
           "paths": {
             "/": {
