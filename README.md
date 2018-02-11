@@ -32,13 +32,13 @@ _Options:_
 
 `sammie deploy`: **Deploy a SAM app**  
 _Options:_  
-`-t, --template`: Path to your SAM template. Defaults to `sam.json` in the current directory.  
+`-t, --template`: Path to your SAM template. Defaults to `sam.json` or `sam.yaml` in the current directory.  
 `-e, --environment`: An environment name to deploy. Defaults to "development".  
 `-p, --parameters`: A list of parameters to override in your template.
 
 `sammie validate`: **Validate a SAM template**  
 _Options:_  
-`-t, --template`: Path to your SAM template. Defaults to `sam.json` in the current directory.
+`-t, --template`: Path to your SAM template. Defaults to `sam.json` or `sam.yaml` in the current directory.
 
 ### Bootstrapping existing SAM projects
 

@@ -1,5 +1,6 @@
 const { spawn } = require('child_process')
-const { writeFile, unlink } = require('fs')
+const { join } = require('path')
+const { readFileSync, writeFile, unlink } = require('fs')
 const { promisify } = require('util')
 
 const formatInfo = '\x1b[36m'
@@ -28,7 +29,24 @@ function resourceSafeName(string) {
   return pascaledString.charAt(0).toUpperCase() + pascaledString.slice(1)
 }
 
+function loadTemplate(input) {
+  if (input.template) return readTemplate(input.template)
+  const defaultTemplates = ['sam.json', 'sam.yaml']
+  for (let i = 0; i < defaultTemplates.length; i++) {
+    try {
+      return readTemplate(defaultTemplates[i])
+    } catch (e) {}
+  }
+  throw Error('Template not found')
+}
+
+function readTemplate(filename) {
+  const templatePath = join(process.cwd(), filename)
+  const templateString = readFileSync(templatePath, 'utf8')
+  return { templatePath, templateString }
+}
+
 const writeFileAsync = promisify(writeFile)
 const delteFileAsync = promisify(unlink)
 
-module.exports = { log, spawnAsync, stackSafeName, resourceSafeName, writeFileAsync, delteFileAsync }
+module.exports = { log, spawnAsync, stackSafeName, resourceSafeName, loadTemplate, writeFileAsync, delteFileAsync }

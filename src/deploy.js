@@ -1,8 +1,7 @@
-const { readFileSync } = require('fs')
-const { join, extname } = require('path')
 const AWS = require('aws-sdk')
 const yaml = require('js-yaml')
-const { spawnAsync, delteFileAsync, log } = require('./utils')
+const { extname } = require('path')
+const { loadTemplate, spawnAsync, delteFileAsync, log } = require('./utils')
 const validate = require('./validate')
 
 // TODO: Use the nodejs SDK instead of `cloudformation package`, `cloudformation deploy`
@@ -57,11 +56,11 @@ async function getEndpointUrl(stackName) {
 
 async function deploy(input) {
   if (!await validate(input)) return
-  const templatePath = join(process.cwd(), input.template || 'sam.json')
+  const { templatePath, templateString } = loadTemplate(input)
   const templateExt = extname(templatePath)
-  const templatePathPkg = templatePath.replace(new RegExp(templateExt + '$'), '-packaged' + templateExt)
   const useJson = templateExt === '.json'
-  const templateJson = useJson ? require(templatePath) : yaml.safeLoad(readFileSync(templatePath, 'utf8'))
+  const templateJson = useJson ? JSON.parse(templateString) : yaml.safeLoad(templateString)
+  const templatePathPkg = templatePath.replace(new RegExp(templateExt + '$'), '-packaged' + templateExt)
   const templateParams = templateJson.Parameters
   const bucketName = templateParams.bucketName.Default
   const environment =
