@@ -2,6 +2,7 @@ const sade = require('sade')
 const pkg = require('../package')
 const init = require('./init')
 const deploy = require('./deploy')
+const validate = require('./validate')
 
 process.env.AWS_SDK_LOAD_CONFIG = true
 process.on('unhandledRejection', e => {
@@ -28,5 +29,13 @@ cli
   .example('deploy')
   .example('deploy --template ./config/template.json --environment production --parameters foo=bar')
   .action(deploy)
+
+cli
+  .command('validate')
+  .describe('Validate a SAM template')
+  .option('-t, --template', 'Path to the SAM template. Defaults to `sam.json` in the current directory.')
+  .example('validate')
+  .example('validate --template ./config/template.json')
+  .action(validate)
 
 module.exports = cli

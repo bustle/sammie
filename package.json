@@ -1,7 +1,7 @@
 {
   "name": "sammie",
-  "version": "0.3.3",
-  "description": "Serverless Application Model Made Infinitely Easier™",
+  "version": "0.3.4",
+  "description": "Serverless Application Model Made Infinitely Easier",
   "license": "MIT",
   "author": "Garth Poitras <garth22@gmail.com>",
   "repository": {
