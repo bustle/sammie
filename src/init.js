@@ -34,8 +34,7 @@ async function init(name, opts) {
   const stackName = stackSafeName(name)
   const sam = makeSam(stackName, opts)
   const lambda = makeLambda(stackName)
-  const files = [await sam, await lambda]
-  log(`Created "${stackName}" with files:\n`, files.join(' \n '))
+  log(`Created "${stackName}" ✔︎\n`, `template: ${await sam}\n`, `code:     ${await lambda}`)
 }
 
 module.exports = init

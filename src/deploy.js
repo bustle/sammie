@@ -3,6 +3,7 @@ const { join, extname } = require('path')
 const AWS = require('aws-sdk')
 const yaml = require('js-yaml')
 const { spawnAsync, delteFileAsync, log } = require('./utils')
+const validate = require('./validate')
 
 // TODO: Use the nodejs SDK instead of `cloudformation package`, `cloudformation deploy`
 // https://github.com/gpoitch/sammie/issues/1
@@ -15,7 +16,8 @@ async function packageProject(templatePath, templatePathPkg, bucketName, useJson
     `--s3-bucket ${bucketName} ` +
     `${useJson ? '--use-json' : ''}`
 
-  log('Packaging:', templatePath, '-->', templatePathPkg)
+  log('Packaging\n', templatePath, '=>', templatePathPkg)
+  log('Uploading\n', `s3://${bucketName}`)
   return spawnAsync(command)
 }
 
@@ -28,7 +30,7 @@ async function deployStack(templatePathPkg, stackName, parameters) {
     `--capabilities CAPABILITY_IAM ` +
     `${parametersFlag ? '--parameter-overrides ' + parametersFlag : ''}`
 
-  log('Deploying', parametersFlag ? `\n parameters: ${parametersFlag}` : '')
+  log('Deploying\n', `stack: ${stackName}`, parametersFlag ? `\n parameters: ${parametersFlag}` : '')
   return spawnAsync(command)
 }
 
@@ -54,6 +56,7 @@ async function getEndpointUrl(stackName) {
 }
 
 async function deploy(input) {
+  if (!await validate(input)) return
   const templatePath = join(process.cwd(), input.template || 'sam.json')
   const templateExt = extname(templatePath)
   const templatePathPkg = templatePath.replace(new RegExp(templateExt + '$'), '-packaged' + templateExt)
