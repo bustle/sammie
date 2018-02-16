@@ -4,7 +4,16 @@ const init = require('./init')
 const deploy = require('./deploy')
 const validate = require('./validate')
 
+// Tell AWS Node SDK to try to read the region from ~.aws/config
 process.env.AWS_SDK_LOAD_CONFIG = true
+
+// Normalize region env variable between AWS Node SDK (AWS_REGION) and AWS CLI (AWS_DEFAULT_REGION)
+if (process.env.AWS_DEFAULT_REGION) {
+  process.env.AWS_REGION = process.env.AWS_DEFAULT_REGION
+} else if (process.env.AWS_REGION) {
+  process.env.AWS_DEFAULT_REGION = process.env.AWS_REGION
+}
+
 process.on('unhandledRejection', e => {
   throw e
 })
