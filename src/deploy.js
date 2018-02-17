@@ -1,22 +1,27 @@
 const AWS = require('aws-sdk')
 const yaml = require('js-yaml')
 const { extname } = require('path')
+const { execSync } = require('child_process')
 const { loadTemplate, spawnAsync, delteFileAsync, log } = require('./utils')
 const validate = require('./validate')
 
-// TODO: Use the nodejs SDK instead of `cloudformation package`, `cloudformation deploy`
+// TODO: Use the nodejs SDK instead of aws cli `cloudformation package` + `cloudformation deploy`
 // https://github.com/gpoitch/sammie/issues/1
 
+function checkCliVersion() {
+  const output = execSync('aws cloudformation package help')
+  if (!/--use-json/.test(output)) throw Error('Please upgrade aws cli to the latest version')
+}
+
 async function packageProject(templatePath, templatePathPkg, bucketName, useJson) {
+  log('Packaging\n', templatePath, '=>', templatePathPkg, `\n and uploading to s3://${bucketName}`)
+  checkCliVersion()
   const command =
     `aws cloudformation package ` +
     `--template-file ${templatePath} ` +
     `--output-template-file ${templatePathPkg} ` +
     `--s3-bucket ${bucketName} ` +
     `${useJson ? '--use-json' : ''}`
-
-  log('Packaging\n', templatePath, '=>', templatePathPkg)
-  log('Uploading\n', `s3://${bucketName}`)
   return spawnAsync(command)
 }
 
