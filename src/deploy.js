@@ -14,7 +14,6 @@ function checkCliVersion() {
 }
 
 async function packageProject(templatePath, templatePathPkg, bucketName, useJson) {
-  log('Packaging\n', templatePath, '=>', templatePathPkg, `\n and uploading to s3://${bucketName}`)
   checkCliVersion()
   const command =
     `aws cloudformation package ` +
@@ -22,6 +21,8 @@ async function packageProject(templatePath, templatePathPkg, bucketName, useJson
     `--output-template-file ${templatePathPkg} ` +
     `--s3-bucket ${bucketName} ` +
     `${useJson ? '--use-json' : ''}`
+
+  log('Packaging\n', templatePath, `=> s3://${bucketName}\n`, `via cli command: ${command}`)
   return spawnAsync(command)
 }
 
@@ -34,7 +35,7 @@ async function deployStack(templatePathPkg, stackName, parameters) {
     `--capabilities CAPABILITY_IAM ` +
     `${parametersFlag ? '--parameter-overrides ' + parametersFlag : ''}`
 
-  log('Deploying\n', `stack: ${stackName}`, parametersFlag ? `\n parameters: ${parametersFlag}` : '')
+  log('Deploying\n', `stack: ${stackName}\n`, `via cli command: ${command}`)
   return spawnAsync(command)
 }
 
