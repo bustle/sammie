@@ -1,12 +1,8 @@
-const AWS = require('aws-sdk')
 const yaml = require('js-yaml')
 const { extname } = require('path')
 const { execSync } = require('child_process')
-const { loadTemplate, spawnAsync, delteFileAsync, log } = require('./utils')
+const { loadTemplate, spawnAsync, delteFileAsync, logInfo, logCommand, checkmark } = require('./utils')
 const validate = require('./validate')
-
-// TODO: Use the nodejs SDK instead of aws cli `cloudformation package` + `cloudformation deploy`
-// https://github.com/gpoitch/sammie/issues/1
 
 function checkCliVersion() {
   const output = execSync('aws cloudformation package help')
@@ -21,8 +17,8 @@ async function packageProject(templatePath, templatePathPkg, bucketName, useJson
     `--output-template-file ${templatePathPkg} ` +
     `--s3-bucket ${bucketName} ` +
     `${useJson ? '--use-json' : ''}`
-
-  log('Packaging\n', templatePath, `=> s3://${bucketName}\n`, `via cli command: ${command}`)
+  logInfo('Packaging and uploading code...')
+  logCommand(command)
   return spawnAsync(command)
 }
 
@@ -34,18 +30,24 @@ async function deployStack(templatePathPkg, stackName, parameters) {
     `--stack-name ${stackName} ` +
     `--capabilities CAPABILITY_IAM ` +
     `${parametersFlag ? '--parameter-overrides ' + parametersFlag : ''}`
-
-  log('Deploying\n', `stack: ${stackName}\n`, `via cli command: ${command}`)
+  logInfo(`Deploying stack: "${stackName}"...`)
+  logCommand(command)
   return spawnAsync(command)
 }
 
 async function createS3Bucket(bucketName) {
-  return new AWS.S3().createBucket({ Bucket: bucketName }).promise()
+  logInfo('Creating s3 code bucket (if necessary)...')
+  const command = `aws s3api create-bucket --bucket ${bucketName}`
+  logCommand(command)
+  const data = await spawnAsync(command)
+  const bucketLocation = data.Location
+  if (!bucketLocation) throw Error('Bucket could not be created')
+  return bucketLocation
 }
 
 async function getStackOutputs(stackName) {
-  const cloudformation = new AWS.CloudFormation()
-  const data = await cloudformation.describeStacks({ StackName: stackName }).promise()
+  const command = `aws cloudformation describe-stacks --stack-name ${stackName}`
+  const data = await spawnAsync(command)
   const outputs = data.Stacks[0].Outputs.reduce((result, o) => {
     result[o.OutputKey] = o.OutputValue
     return result
@@ -61,7 +63,7 @@ async function getEndpointUrl(stackName) {
 }
 
 async function deploy(input) {
-  if (!await validate(input)) return
+  await validate(input)
   const { templatePath, templateString } = loadTemplate(input)
   const templateExt = extname(templatePath)
   const useJson = templateExt === '.json'
@@ -78,7 +80,8 @@ async function deploy(input) {
   await deployStack(templatePathPkg, stackName, deployParams)
   delteFileAsync(templatePathPkg)
   const url = await getEndpointUrl(stackName)
-  log('Deploy success ✔︎', url ? `\n ${url}` : '')
+  logInfo('Deploy success', checkmark)
+  logInfo('Live url:', url)
 }
 
 module.exports = deploy

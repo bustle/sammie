@@ -25,9 +25,8 @@
     "clean": "rm -f index.js | rm -f sam.json | rm -f sam.yaml | rm -f sam-packaged.json"
   },
   "dependencies": {
-    "aws-sdk": "^2.204.0",
-    "js-yaml": "^3.10.0",
-    "sade": "^1.3.2"
+    "js-yaml": "^3.11.0",
+    "sade": "^1.4.0"
   },
   "devDependencies": {
     "flt": "^0.2.2"
