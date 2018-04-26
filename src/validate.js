@@ -1,11 +1,12 @@
-const AWS = require('aws-sdk')
-const { loadTemplate, log } = require('./utils')
+const { loadTemplate, spawnAsync, logInfo, logCommand, checkmark } = require('./utils')
 
 async function validate(input) {
-  const { templatePath, templateString } = loadTemplate(input)
-  await new AWS.CloudFormation().validateTemplate({ TemplateBody: templateString }).promise()
-  log(`Valid template ✔︎\n`, templatePath)
-  return true
+  const { templatePath } = loadTemplate(input)
+  const command = `aws cloudformation validate-template --template-body file://${templatePath}`
+  logInfo(`Validating template...`)
+  logCommand(command)
+  await spawnAsync(command)
+  logInfo('Template valid', checkmark)
 }
 
 module.exports = validate

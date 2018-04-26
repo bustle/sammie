@@ -3,20 +3,37 @@ const { join } = require('path')
 const { readFileSync, writeFile, unlink } = require('fs')
 const { promisify } = require('util')
 
-const formatInfo = '\x1b[36m'
-const formatError = '\x1b[31m'
+const formatCyan = '\x1b[36m'
+const formatGreen = '\x1b[32m'
+const formatYellow = '\x1b[33m'
+const formatRed = '\x1b[31m'
 const formatReset = '\x1b[0m'
+const checkmark = `${formatGreen}✔︎${formatReset}`
 
-function log(...args) {
-  console.log('\n', `${formatInfo}[sammie]${formatReset}`, ...args, '\n') // eslint-disable-line no-console
+function logInfo(...args) {
+  console.info(`${formatCyan}[sammie]${formatReset}`, ...args) // eslint-disable-line no-console
+}
+
+function logCommand(...args) {
+  console.log(formatYellow, ...args, formatReset) // eslint-disable-line no-console
 }
 
 async function spawnAsync(command) {
   const child = spawn(command, { shell: true })
   return new Promise((resolve, reject) => {
-    child.stderr.on('data', data => console.error(formatError, data.toString(), formatReset)) // eslint-disable-line no-console
+    let data = ''
+    child.stdout.on('data', chunk => (data += chunk))
+    child.stderr.on('data', data => console.error(formatRed, data.toString(), formatReset)) // eslint-disable-line no-console
     child.on('error', reject)
-    child.on('exit', code => (code === 0 ? resolve(child.stdout) : reject(Error(code))))
+    child.on('exit', code => {
+      let response
+      try {
+        response = JSON.parse(data)
+      } catch (e) {
+        response = data
+      }
+      code === 0 ? resolve(response) : reject(Error(code))
+    })
   })
 }
 
@@ -49,4 +66,14 @@ function readTemplate(filename) {
 const writeFileAsync = promisify(writeFile)
 const delteFileAsync = promisify(unlink)
 
-module.exports = { log, spawnAsync, stackSafeName, resourceSafeName, loadTemplate, writeFileAsync, delteFileAsync }
+module.exports = {
+  logInfo,
+  logCommand,
+  checkmark,
+  spawnAsync,
+  stackSafeName,
+  resourceSafeName,
+  loadTemplate,
+  writeFileAsync,
+  delteFileAsync
+}
