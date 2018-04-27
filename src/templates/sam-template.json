@@ -15,7 +15,7 @@
         "FunctionName": { "Ref": "AWS::StackName" },
         "CodeUri": "index.js",
         "Handler": "index.handler",
-        "Runtime": "nodejs6.10",
+        "Runtime": "nodejs8.10",
         "MemorySize": 128,
         "Timeout": 3
       }
