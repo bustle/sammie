@@ -1,7 +1,8 @@
 const { extname } = require('path')
 const { readFileSync } = require('fs')
 const { execSync } = require('child_process')
-const { spawnAsync, delteFileAsync, logInfo, logCommand, checkmark } = require('./utils')
+const { spawnAsync, delteFileAsync } = require('./utils')
+const { logInfo, logCommand, logSuccess } = require('./log')
 const validate = require('./validate')
 const yaml = require('js-yaml')
 
@@ -81,7 +82,7 @@ async function deploy(input) {
   await deployStack(templatePathPkg, stackName, deployParams)
   delteFileAsync(templatePathPkg)
   const url = await getEndpointUrl(stackName)
-  logInfo('Deploy success', checkmark)
+  logSuccess('Deploy success')
   logInfo('Live url:', url)
 }
 

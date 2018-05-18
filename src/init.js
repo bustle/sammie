@@ -1,5 +1,6 @@
 const yaml = require('js-yaml')
-const { resourceSafeName, stackSafeName, writeFileAsync, spawnAsync, logInfo, checkmark } = require('./utils')
+const { resourceSafeName, stackSafeName, writeFileAsync, spawnAsync } = require('./utils')
+const { logInfo, checkmark } = require('./log')
 const samTemplate = require('./templates/sam-template')
 const lambdaTemplate = require('./templates/lambda-template')
 
