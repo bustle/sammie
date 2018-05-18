@@ -22,14 +22,14 @@ async function makeSam(name, opts) {
   template.Parameters.bucketName.Default = `sam-uploads-${accountId}`
   template.Parameters.stackName.Default = name
   const content = useYaml ? yaml.safeDump(template) : JSON.stringify(template, null, 2) + '\n'
-  await writeFileAsync(path, content)
+  await writeFileAsync(path, content, { flag: 'wx' })
   return path
 }
 
 async function makeLambda(name) {
   const path = 'index.js'
   const func = lambdaTemplate.replace(/__NAME__/g, name)
-  await writeFileAsync(path, func)
+  await writeFileAsync(path, func, { flag: 'wx' })
   return path
 }
 
