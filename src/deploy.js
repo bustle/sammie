@@ -1,8 +1,9 @@
-const yaml = require('js-yaml')
 const { extname } = require('path')
+const { readFileSync } = require('fs')
 const { execSync } = require('child_process')
-const { loadTemplate, spawnAsync, delteFileAsync, logInfo, logCommand, checkmark } = require('./utils')
+const { spawnAsync, delteFileAsync, logInfo, logCommand, checkmark } = require('./utils')
 const validate = require('./validate')
+const yaml = require('js-yaml')
 
 function checkCliVersion() {
   const output = execSync('aws cloudformation package help')
@@ -63,10 +64,10 @@ async function getEndpointUrl(stackName) {
 }
 
 async function deploy(input) {
-  await validate(input)
-  const { templatePath, templateString } = loadTemplate(input)
+  const templatePath = await validate(input)
   const templateExt = extname(templatePath)
   const useJson = templateExt === '.json'
+  const templateString = readFileSync(templatePath, 'utf8')
   const templateJson = useJson ? JSON.parse(templateString) : yaml.safeLoad(templateString)
   const templatePathPkg = templatePath.replace(new RegExp(templateExt + '$'), '-packaged' + templateExt)
   const templateParams = templateJson.Parameters
