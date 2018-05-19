@@ -21,4 +21,4 @@ function logCommand(...args) {
   console.log(YELLOW, ...args, RESET) // eslint-disable-line no-console
 }
 
-module.exports = { logInfo, logSuccess, logError, logCommand, checkmark }
+module.exports = { logInfo, logSuccess, logError, logCommand }

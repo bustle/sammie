@@ -1,19 +1,21 @@
 const yaml = require('js-yaml')
 const { resourceSafeName, stackSafeName, writeFileAsync, spawnAsync } = require('./utils')
-const { logInfo, checkmark } = require('./log')
+const { logInfo, logSuccess, logCommand } = require('./log')
 const samTemplate = require('./templates/sam-template')
 const lambdaTemplate = require('./templates/lambda-template')
 
 async function getAccountId() {
   logInfo('Getting AWS account id...')
   const command = `aws sts get-caller-identity`
+  logCommand(command)
   const data = await spawnAsync(command)
   const accountId = data.Account
   if (!accountId) throw Error('Could not get AWS account id')
+  logSuccess('Account id:', accountId)
   return accountId
 }
 
-async function makeSam(name, opts) {
+async function makeSamTemplate(name, opts) {
   const accountId = await getAccountId()
   const useYaml = opts.yaml
   const path = `sam.${useYaml ? 'yaml' : 'json'}`
@@ -26,7 +28,7 @@ async function makeSam(name, opts) {
   return path
 }
 
-async function makeLambda(name) {
+async function makeLambdaFunctionCode(name) {
   const path = 'index.js'
   const func = lambdaTemplate.replace(/__NAME__/g, name)
   await writeFileAsync(path, func, { flag: 'wx' })
@@ -35,9 +37,10 @@ async function makeLambda(name) {
 
 async function init(name, opts) {
   const stackName = stackSafeName(name)
-  const sam = makeSam(stackName, opts)
-  const lambda = makeLambda(stackName)
-  logInfo(`Created project: "${stackName}"`, checkmark, '\n', `template: ${await sam}\n`, `code:     ${await lambda}`)
+  const templatePath = await makeSamTemplate(stackName, opts)
+  const codePath = await makeLambdaFunctionCode(stackName)
+  logSuccess(`Created project: "${stackName}"`)
+  logInfo('template:', templatePath, '| code:', codePath)
 }
 
 module.exports = init
