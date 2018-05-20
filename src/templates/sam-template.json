@@ -2,6 +2,7 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
 
+  "Description": "__NAME__",
   "Parameters": {
     "stackName": { "Type": "String" },
     "bucketName": { "Type": "String" },
@@ -16,8 +17,8 @@
         "CodeUri": "index.js",
         "Handler": "index.handler",
         "Runtime": "nodejs8.10",
-        "MemorySize": 128,
-        "Timeout": 3
+        "MemorySize": 256,
+        "Timeout": 10
       }
     },
 
