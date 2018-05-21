@@ -1,8 +1,8 @@
 const yaml = require('js-yaml')
-const { resourceSafeName, stackSafeName, writeFileAsync, spawnAsync } = require('./utils')
-const { logInfo, logSuccess, logCommand } = require('./log')
-const samTemplate = require('./templates/sam-template')
-const lambdaTemplate = require('./templates/lambda-template')
+const { resourceSafeName, stackSafeName, writeFileAsync, spawnAsync } = require('../utils')
+const { logInfo, logSuccess, logCommand } = require('../log')
+const samTemplate = require('../templates/sam')
+const lambdaTemplate = require('../templates/lambda')
 
 async function getAccountId() {
   logInfo('Getting AWS account id...')

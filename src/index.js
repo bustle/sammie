@@ -1,16 +1,17 @@
 const sade = require('sade')
-const pkg = require('../package')
-const init = require('./init')
-const deploy = require('./deploy')
-const validate = require('./validate')
+const packageJson = require('../package')
+const init = require('./commands/init')
+const deploy = require('./commands/deploy')
+const validate = require('./commands/validate')
+const packageProject = require('./commands/package')
 
 process.on('unhandledRejection', e => {
   throw e
 })
 
-const cli = sade(pkg.name)
+const cli = sade(packageJson.name)
 
-cli.version(pkg.version)
+cli.version(packageJson.version)
 
 cli
   .command('init <name>')
@@ -31,10 +32,19 @@ cli
 
 cli
   .command('validate')
-  .describe('Validate a SAM template')
+  .describe('Validate a SAM template [private - runs on `deploy`]')
   .option('-t, --template', 'Path to a SAM template. Defaults to `sam.(json|yaml)` in the current directory')
   .example('validate')
   .example('validate --template ./config/sam.json')
   .action(validate)
+
+cli
+  .command('package')
+  .describe('Package & upload code [private - runs on `deploy`]')
+  .option('-t, --template', 'Path to a SAM template. Defaults to `sam.(json|yaml)` in the current directory')
+  .option('-e, --environment', 'An environment name to package. Defaults to "development".')
+  .example('package')
+  .example('package --template ./config/sam.json --environment production')
+  .action(packageProject)
 
 module.exports = cli

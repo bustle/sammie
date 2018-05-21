@@ -1,5 +1,5 @@
-const { findTemplatePath, spawnAsync } = require('./utils')
-const { logInfo, logCommand, logSuccess } = require('./log')
+const { findTemplatePath, spawnAsync } = require('../utils')
+const { logInfo, logCommand, logSuccess } = require('../log')
 
 async function validate(input) {
   const templatePath = findTemplatePath(input)
@@ -8,7 +8,6 @@ async function validate(input) {
   logCommand(command)
   await spawnAsync(command)
   logSuccess('Template valid')
-  return templatePath
 }
 
 module.exports = validate
