@@ -28,7 +28,7 @@ async function makeSamTemplate(name, opts) {
   return path
 }
 
-async function makeLambdaFunctionCode(name) {
+async function makeLambdaFunction(name) {
   const path = 'index.js'
   const func = lambdaTemplate.replace(/__NAME__/g, name)
   await writeFileAsync(path, func, { flag: 'wx' })
@@ -38,7 +38,7 @@ async function makeLambdaFunctionCode(name) {
 async function init(name, opts) {
   const stackName = stackSafeName(name)
   const templatePath = await makeSamTemplate(stackName, opts)
-  const codePath = await makeLambdaFunctionCode(stackName)
+  const codePath = await makeLambdaFunction(stackName)
   logSuccess(`Created project: "${stackName}"`)
   logInfo('template:', templatePath, '| code:', codePath)
 }

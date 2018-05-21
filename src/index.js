@@ -14,27 +14,27 @@ cli.version(pkg.version)
 
 cli
   .command('init <name>')
-  .describe('Initialize a SAM project with a project <name>')
+  .describe('Initialize a project with a <name>')
   .option('-y, --yaml', 'Generate yaml for SAM template. Defaults to json, because javascript.')
-  .example('init myapp')
+  .example('init my-app')
   .action(init)
 
 cli
   .command('deploy')
   .describe('Deploy a SAM project')
-  .option('-t, --template', 'Path to the SAM template. Defaults to `sam.json` in the current directory.')
-  .option('-e, --environment', 'An environment name to deploy. Defaults to development.')
+  .option('-t, --template', 'Path to a SAM template. Defaults to `sam.(json|yaml)` in the current directory.')
+  .option('-e, --environment', 'An environment name to deploy. Defaults to "development".')
   .option('-p, --parameters', 'A list of parameters to override in your template.')
   .example('deploy')
-  .example('deploy --template ./config/template.json --environment production --parameters foo=bar')
+  .example('deploy --template ./configs/sam.json --environment production --parameters key1=val1 key2=val2')
   .action(deploy)
 
 cli
   .command('validate')
   .describe('Validate a SAM template')
-  .option('-t, --template', 'Path to the SAM template. Defaults to `sam.json` in the current directory.')
+  .option('-t, --template', 'Path to a SAM template. Defaults to `sam.(json|yaml)` in the current directory')
   .example('validate')
-  .example('validate --template ./config/template.json')
+  .example('validate --template ./config/sam.json')
   .action(validate)
 
 module.exports = cli
