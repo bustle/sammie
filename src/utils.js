@@ -1,6 +1,6 @@
 const { spawn } = require('child_process')
 const { relative } = require('path')
-const { existsSync, writeFile, unlink } = require('fs')
+const { existsSync, readFile, writeFile, unlink } = require('fs')
 const { promisify } = require('util')
 const { logError } = require('./log')
 
@@ -46,6 +46,7 @@ module.exports = {
   stackSafeName,
   resourceSafeName,
   findTemplatePath,
+  readFileAsync: promisify(readFile),
   writeFileAsync: promisify(writeFile),
-  delteFileAsync: promisify(unlink)
+  deleteFileAsync: promisify(unlink)
 }

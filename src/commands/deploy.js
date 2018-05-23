@@ -1,6 +1,6 @@
 const validate = require('./validate')
 const packageProject = require('./package')
-const { spawnAsync, delteFileAsync } = require('../utils')
+const { spawnAsync, deleteFileAsync } = require('../utils')
 const { logInfo, logCommand, logSuccess } = require('../log')
 
 async function deployStack(templatePathPackaged, stackName, parameters) {
@@ -40,7 +40,7 @@ async function deploy(input) {
   const deployParams = [].concat(input.parameters || [], `environment=${environment}`)
   await deployStack(templatePathPackaged, stackName, deployParams)
   logSuccess('Deployed')
-  delteFileAsync(templatePathPackaged)
+  deleteFileAsync(templatePathPackaged)
   const url = await getEndpointUrl(stackName)
   logInfo('Live url:', url)
 }
