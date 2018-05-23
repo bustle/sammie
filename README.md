@@ -5,7 +5,7 @@
 ### Features
 
 * Generate a minimal yet flexible SAM template for you to get started.
-* Simplify SAM's complex packaging & deploy steps into a single `deploy` command.
+* Simplify SAM's complex packaging & deploy steps/flags into a simple `deploy` command.
 * Provide a best practice for deploying multiple environments.
 
 ![sammie](https://user-images.githubusercontent.com/411908/35882654-ea43468a-0b52-11e8-9a0c-d5d721e56a51.gif)
@@ -26,19 +26,19 @@ This will initialize a basic SAM template, deploy it to a development environmen
 
 ### Commands
 
-`sammie init <name>`: **Generate a SAM template**  
+#### init - Generates a SAM template & lambda function
+
+`sammie init <name>`
 _Options:_  
 `-y, --yaml`: Generate yaml for SAM template. Defaults to json, because javascript.
 
-`sammie deploy`: **Deploy a SAM app**  
+#### deploy - Deploys application
+
+`sammie deploy`
 _Options:_  
-`-t, --template`: Path to your SAM template. Defaults to `sam.json` or `sam.yaml` in the current directory.  
+`-t, --template`: Path to a SAM template. Defaults to `sam.(json|yaml)` in the current directory.  
 `-e, --environment`: An environment name to deploy. Defaults to "development".  
 `-p, --parameters`: A list of parameters to override in your template.
-
-`sammie validate`: **Validate a SAM template**  
-_Options:_  
-`-t, --template`: Path to your SAM template. Defaults to `sam.json` or `sam.yaml` in the current directory.
 
 ### Bootstrapping existing SAM projects
 

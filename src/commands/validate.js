@@ -1,12 +1,13 @@
-const { loadTemplate, spawnAsync, logInfo, logCommand, checkmark } = require('./utils')
+const { findTemplatePath, spawnAsync } = require('../utils')
+const { logInfo, logCommand, logSuccess } = require('../log')
 
 async function validate(input) {
-  const { templatePath } = loadTemplate(input)
+  const templatePath = findTemplatePath(input)
   const command = `aws cloudformation validate-template --template-body file://${templatePath}`
   logInfo(`Validating template...`)
   logCommand(command)
   await spawnAsync(command)
-  logInfo('Template valid', checkmark)
+  logSuccess('Template valid')
 }
 
 module.exports = validate

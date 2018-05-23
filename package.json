@@ -13,6 +13,7 @@
     "sam",
     "serverless",
     "lambda",
+    "api-gateway",
     "cloudformation"
   ],
   "main": "src/index.js",
@@ -20,15 +21,15 @@
   "engines": {
     "node": ">=8"
   },
-  "scripts": {
-    "test": "flt",
-    "clean": "rm -f index.js | rm -f sam.json | rm -f sam.yaml | rm -f sam-packaged.json"
-  },
   "dependencies": {
     "js-yaml": "^3.11.0",
-    "sade": "^1.4.0"
+    "sade": "^1.4.1"
   },
   "devDependencies": {
-    "flt": "^0.2.2"
+    "flt": "^0.3.0"
+  },
+  "scripts": {
+    "test": "flt",
+    "clean": "rm -f index.js | rm -f sam.json | rm -f sam.yaml | rm -f sam-packaged.json | rm -f .eslintcache"
   }
 }
