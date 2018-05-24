@@ -16,6 +16,11 @@ function parseTemplate(templateString, templateExt) {
   return useJson ? JSON.parse(templateString) : yaml.safeLoad(templateString)
 }
 
+function serializeTemplate(templateJson, templateExt) {
+  const useJson = templateExt === '.json'
+  return useJson ? JSON.stringify(templateJson, null, 2) : yaml.safeDump(templateJson)
+}
+
 function filePathWithSuffix(filePath, suffix) {
   const fileExt = extname(filePath)
   const fileWithoutExt = basename(filePath, fileExt)
@@ -32,6 +37,7 @@ async function createS3Bucket(bucketName) {
 }
 
 async function mergeEnvTemplate(baseTemplatePath, baseTemplateJson, environment) {
+  const templateExt = extname(baseTemplatePath)
   const environmentTemplatePath = filePathWithSuffix(baseTemplatePath, `-${environment}`)
   let enviromentTemplateString
   try {
@@ -40,10 +46,11 @@ async function mergeEnvTemplate(baseTemplatePath, baseTemplateJson, environment)
     return
   }
   log.info(`Merging ${environment} template (${environmentTemplatePath}) with base template (${baseTemplatePath})`)
-  const enviromentTemplateJson = parseTemplate(enviromentTemplateString, extname(baseTemplatePath))
+  const enviromentTemplateJson = parseTemplate(enviromentTemplateString, templateExt)
   const mergedTemplateJson = deepmerge(baseTemplateJson, enviromentTemplateJson)
+  const mergedTemplateString = serializeTemplate(mergedTemplateJson, templateExt)
   const mergedTemplatePath = filePathWithSuffix(baseTemplatePath, `-${environment}-merged`)
-  await writeFileAsync(mergedTemplatePath, JSON.stringify(mergedTemplateJson, null, 2))
+  await writeFileAsync(mergedTemplatePath, mergedTemplateString)
   return mergedTemplatePath
 }
 
