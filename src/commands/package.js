@@ -1,9 +1,9 @@
 const { execSync } = require('child_process')
-const { extname } = require('path')
-const { readFileSync } = require('fs')
+const { basename, extname, dirname, join } = require('path')
 const yaml = require('js-yaml')
-const { logInfo, logCommand, logSuccess } = require('../log')
-const { findTemplatePath, spawnAsync } = require('../utils')
+const deepmerge = require('deepmerge')
+const log = require('../log')
+const { findTemplatePath, spawnAsync, readFileAsync, writeFileAsync } = require('../utils')
 
 // Older versions of aws cli don't support json for `aws cloudformation package`
 function checkCliVersion() {
@@ -11,38 +11,70 @@ function checkCliVersion() {
   if (!/--use-json/.test(output)) throw Error('Please upgrade aws cli to the latest version')
 }
 
+function parseTemplate(templateString, templateExt) {
+  const useJson = templateExt === '.json'
+  return useJson ? JSON.parse(templateString) : yaml.safeLoad(templateString)
+}
+
+function serializeTemplate(templateJson, templateExt) {
+  const useJson = templateExt === '.json'
+  return useJson ? JSON.stringify(templateJson, null, 2) : yaml.safeDump(templateJson)
+}
+
+function filePathWithSuffix(filePath, suffix) {
+  const fileExt = extname(filePath)
+  const fileWithoutExt = basename(filePath, fileExt)
+  return join(dirname(filePath), fileWithoutExt + suffix + fileExt)
+}
+
 async function createS3Bucket(bucketName) {
-  logInfo('Creating s3 code bucket (if necessary)...')
   const command = `aws s3api create-bucket --bucket ${bucketName}`
-  logCommand(command)
+  log.info('Creating s3 code bucket (if necessary)...').command(command)
   const data = await spawnAsync(command)
   const bucketLocation = data.Location
   if (!bucketLocation) throw Error('Bucket could not be created')
   return bucketLocation
 }
 
-async function packageProject(input) {
+async function mergeEnvTemplate(baseTemplatePath, baseTemplateJson, environment) {
+  const templateExt = extname(baseTemplatePath)
+  const environmentTemplatePath = filePathWithSuffix(baseTemplatePath, `-${environment}`)
+  let enviromentTemplateString
+  try {
+    enviromentTemplateString = await readFileAsync(environmentTemplatePath, 'utf8')
+  } catch (e) {
+    return
+  }
+  log.info(`Merging ${environment} template (${environmentTemplatePath}) with base template (${baseTemplatePath})`)
+  const enviromentTemplateJson = parseTemplate(enviromentTemplateString, templateExt)
+  const mergedTemplateJson = deepmerge(baseTemplateJson, enviromentTemplateJson)
+  const mergedTemplateString = serializeTemplate(mergedTemplateJson, templateExt)
+  const mergedTemplatePath = filePathWithSuffix(baseTemplatePath, `-${environment}-merged`)
+  await writeFileAsync(mergedTemplatePath, mergedTemplateString)
+  return mergedTemplatePath
+}
+
+module.exports = async function packageProject(input) {
   const templatePath = findTemplatePath(input)
+  const templateString = await readFileAsync(templatePath, 'utf8')
   const templateExt = extname(templatePath)
-  const useJson = templateExt === '.json'
-  const templatePathPackaged = templatePath.replace(new RegExp(templateExt + '$'), '-packaged' + templateExt)
-  const templateString = readFileSync(templatePath, 'utf8')
-  const templateJson = useJson ? JSON.parse(templateString) : yaml.safeLoad(templateString)
-  const bucketName = templateJson.Parameters.bucketName.Default
+  const templateJson = parseTemplate(templateString, templateExt)
+  const parameters = templateJson.Parameters
+  const environment = input.environment || (parameters.environment && parameters.environment.Default) || 'development'
+  const templatePathEnvMerged = await mergeEnvTemplate(templatePath, templateJson, environment)
+  const templatePathPackaged = filePathWithSuffix(templatePath, '-packaged')
+  const bucketName = parameters.bucketName.Default
   const command =
     `aws cloudformation package ` +
-    `--template-file ${templatePath} ` +
+    `--template-file ${templatePathEnvMerged || templatePath} ` +
     `--output-template-file ${templatePathPackaged} ` +
     `--s3-bucket ${bucketName} ` +
-    `${useJson ? '--use-json' : ''}`
+    `${templateExt === '.json' ? '--use-json' : ''}`
 
   checkCliVersion()
   await createS3Bucket(bucketName)
-  logInfo('Packaging and uploading code...')
-  logCommand(command)
+  log.info('Packaging and uploading code...').command(command)
   await spawnAsync(command)
-  logSuccess('Code packaged & uploaded')
-  return { templateJson, templatePathPackaged }
+  log.success('Code packaged & uploaded')
+  return { templatePathEnvMerged, templatePathPackaged, environment, parameters }
 }
-
-module.exports = packageProject

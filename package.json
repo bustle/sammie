@@ -22,6 +22,7 @@
     "node": ">=8"
   },
   "dependencies": {
+    "deepmerge": "^2.1.0",
     "js-yaml": "^3.11.0",
     "sade": "^1.4.1"
   },
@@ -30,6 +31,6 @@
   },
   "scripts": {
     "test": "flt",
-    "clean": "rm -f index.js | rm -f sam.json | rm -f sam.yaml | rm -f sam-packaged.json | rm -f .eslintcache"
+    "clean": "rm -f index.js | rm -f sam*.json | rm -f sam*.yaml | rm -f .eslintcache"
   }
 }

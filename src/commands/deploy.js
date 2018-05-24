@@ -1,7 +1,7 @@
 const validate = require('./validate')
 const packageProject = require('./package')
-const { spawnAsync, delteFileAsync } = require('../utils')
-const { logInfo, logCommand, logSuccess } = require('../log')
+const log = require('../log')
+const { spawnAsync, deleteFileAsync } = require('../utils')
 
 async function deployStack(templatePathPackaged, stackName, parameters) {
   const parametersFlag = parameters && parameters.length && parameters.join(' ')
@@ -11,8 +11,7 @@ async function deployStack(templatePathPackaged, stackName, parameters) {
     `--stack-name ${stackName} ` +
     `--capabilities CAPABILITY_IAM ` +
     `${parametersFlag ? '--parameter-overrides ' + parametersFlag : ''}`
-  logInfo(`Deploying stack: "${stackName}"...`)
-  logCommand(command)
+  log.info(`Deploying stack "${stackName}"...`).command(command)
   return spawnAsync(command)
 }
 
@@ -31,18 +30,15 @@ async function getEndpointUrl(stackName) {
   return apiId && region && environment && `https://${apiId}.execute-api.${region}.amazonaws.com/${environment}`
 }
 
-async function deploy(input) {
+module.exports = async function deploy(input) {
   await validate(input)
-  const { templateJson, templatePathPackaged } = await packageProject(input)
-  const { environment: jsonEnvironment, stackName: jsonStackName } = templateJson.Parameters
-  const environment = input.environment || (jsonEnvironment && jsonEnvironment.Default) || 'development'
-  const stackName = `${jsonStackName.Default}-${environment}`
+  const { templatePathEnvMerged, templatePathPackaged, environment, parameters } = await packageProject(input)
+  const stackName = `${parameters.stackName.Default}-${environment}`
   const deployParams = [].concat(input.parameters || [], `environment=${environment}`)
   await deployStack(templatePathPackaged, stackName, deployParams)
-  logSuccess('Deployed')
-  delteFileAsync(templatePathPackaged)
+  log.success('Deployed')
+  deleteFileAsync(templatePathPackaged)
+  templatePathEnvMerged && deleteFileAsync(templatePathEnvMerged)
   const url = await getEndpointUrl(stackName)
-  logInfo('Live url:', url)
+  log.info('Live url:', url)
 }
-
-module.exports = deploy

@@ -3,22 +3,27 @@ const GREEN = '\x1b[32m'
 const YELLOW = '\x1b[33m'
 const RED = '\x1b[31m'
 const RESET = '\x1b[0m'
-const checkmark = `${GREEN}✔︎${RESET}`
+const CHECK = `${GREEN}✔︎${RESET}`
 
-function logInfo(...args) {
+function info(...args) {
   console.info(`${CYAN}[sammie]${RESET}`, ...args) // eslint-disable-line no-console
+  return log
 }
 
-function logSuccess(...args) {
-  logInfo(...args, checkmark)
-}
-
-function logError(...args) {
+function error(...args) {
   console.error(RED, ...args, RESET) // eslint-disable-line no-console
+  return log
 }
 
-function logCommand(...args) {
+function command(...args) {
   console.log(YELLOW, ...args, RESET) // eslint-disable-line no-console
+  return log
 }
 
-module.exports = { logInfo, logSuccess, logError, logCommand }
+function success(...args) {
+  return info(...args, CHECK)
+}
+
+const log = { info, success, error, command }
+
+module.exports = log

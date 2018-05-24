@@ -5,14 +5,14 @@
 ### Features
 
 * Generate a minimal yet flexible SAM template for you to get started.
-* Simplify SAM's complex packaging & deploy steps/flags into a simple `deploy` command.
+* Simplify SAM's complex packaging & deploy steps & flags into a simple `deploy` command.
 * Provide a best practice for deploying multiple environments.
 
 ![sammie](https://user-images.githubusercontent.com/411908/35882654-ea43468a-0b52-11e8-9a0c-d5d721e56a51.gif)
 
 ### Prerequisites
 
-[AWS CLI](https://aws.amazon.com/cli/)
+[AWS CLI](https://aws.amazon.com/cli/) - sammie uses this for all AWS operations under the hood.
 
 ### Quickstart
 
@@ -22,11 +22,11 @@ sammie init my-app
 sammie deploy
 ```
 
-This will initialize a basic SAM template, deploy it to a development environment, and direct you to your app served over https!
+This will generate a basic serverless application, deploy it to a development environment, and direct you to your app served over https!
 
 ### Commands
 
-#### init - Generates a SAM template & lambda function
+#### init - Generates a serverless application including a SAM template & lambda function
 
 `sammie init <name>`
 _Options:_  
@@ -40,20 +40,34 @@ _Options:_
 `-e, --environment`: An environment name to deploy. Defaults to "development".  
 `-p, --parameters`: A list of parameters to override in your template.
 
-### Bootstrapping existing SAM projects
+### Environments
 
-If you already have a SAM template, you can use `sammie deploy` for a simplified deployment.
-Make sure to add the following parameters to your template so sammie knows where to deploy:
+It's a best practice to create completely separate stacks for each of your application's environments, rather than a single stack with multiple lambda qualifiers, API Gateway stages, and permissions. This makes your application more portable and reduces the blast radius of taking down your live application during the development cycle.
+
+To support this, sammie will deploy separate stacks for you based on your environment option.  
+E.g. your stack name is "my-app":
+`sammie deploy` will deploy stack "my-app-development"  
+`sammie deploy --environment production` will deploy stack "my-app-production"
+
+#### Environment variables & properties
+
+To add environemnt specific variables & properties, you can create separate sam templates named with the environemnt suffix.
+E.g. `sam-production.json` containing the following, will get merged with your base template `sam.json` upon `sammie deploy --environment production`
 
 ```json
-"Parameters": {
-  "stackName": {
-    "Type": "String",
-    "Default": "<your-projects-stack-name>"
-  },
-  "bucketName": {
-    "Type": "String",
-    "Default": "<your-s3-bucket-for-code-uploads>"
+{
+  "Resources": {
+    "TestFunction": {
+      "Properties": {
+        "MemorySize": 1280,
+        "Environment": {
+          "Variables": {
+            "ENV_VAR1": "var1-prod",
+            "ENV_VAR2": "var2-prod"
+          }
+        }
+      }
+    }
   }
 }
 ```
