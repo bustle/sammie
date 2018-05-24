@@ -10,6 +10,8 @@
 
 ![sammie](https://user-images.githubusercontent.com/411908/35882654-ea43468a-0b52-11e8-9a0c-d5d721e56a51.gif)
 
+---
+
 ### Prerequisites
 
 [AWS CLI](https://aws.amazon.com/cli/) - sammie uses this for all AWS operations under the hood.
@@ -24,34 +26,39 @@ sammie deploy
 
 This will generate a basic serverless application, deploy it to a development environment, and direct you to your app served over https!
 
+---
+
 ### Commands
 
 #### init - Generates a serverless application including a SAM template & lambda function
 
-`sammie init <name>`
+`sammie init <name>`  
 _Options:_  
 `-y, --yaml`: Generate yaml for SAM template. Defaults to json, because javascript.
 
 #### deploy - Deploys application
 
-`sammie deploy`
+`sammie deploy`  
 _Options:_  
 `-t, --template`: Path to a SAM template. Defaults to `sam.(json|yaml)` in the current directory.  
 `-e, --environment`: An environment name to deploy. Defaults to "development".  
 `-p, --parameters`: A list of parameters to override in your template.
 
+---
+
 ### Environments
 
 It's a best practice to create completely separate stacks for each of your application's environments, rather than a single stack with multiple lambda qualifiers, API Gateway stages, and permissions. This makes your application more portable and reduces the blast radius of taking down your live application during the development cycle.
 
-To support this, sammie will deploy separate stacks for you based on your environment option.  
-E.g. your stack name is "my-app":
-`sammie deploy` will deploy stack "my-app-development"  
+To support this, sammie will deploy separate stacks for you based on the environment option:
+
+E.g. your stack name is "my-app":  
+`sammie deploy` will deploy stack "my-app-development" (development is the default)  
 `sammie deploy --environment production` will deploy stack "my-app-production"
 
 #### Environment variables & properties
 
-To add environemnt specific variables & properties, you can create separate sam templates named with the environemnt suffix.
+To add environemnt specific variables & properties, create separate sam templates named with the environemnt suffix.  
 E.g. `sam-production.json` containing the following, will get merged with your base template `sam.json` upon `sammie deploy --environment production`
 
 ```json
