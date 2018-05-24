@@ -1,28 +1,35 @@
 const yaml = require('js-yaml')
-const { resourceSafeName, stackSafeName, writeFileAsync, spawnAsync } = require('../utils')
-const { logInfo, logSuccess, logCommand } = require('../log')
+const { writeFileAsync, spawnAsync } = require('../utils')
+const log = require('../log')
 const samTemplate = require('../templates/sam')
 const lambdaTemplate = require('../templates/lambda')
 
 async function getAccountId() {
-  logInfo('Getting AWS account id...')
   const command = `aws sts get-caller-identity`
-  logCommand(command)
+  log.info('Getting AWS account id...').command(command)
   const data = await spawnAsync(command)
   const accountId = data.Account
   if (!accountId) throw Error('Could not get AWS account id')
-  logSuccess('Account id:', accountId)
+  log.success('Account id:', accountId)
   return accountId
 }
 
-async function makeSamTemplate(name, opts) {
-  const accountId = await getAccountId()
-  const useYaml = opts.yaml
+function stackSafeName(string) {
+  return string.trim().replace(/[^a-z0-9]/gi, '-')
+}
+
+function resourceSafeName(string) {
+  const pascaledString = string.replace(/(-|_|\.|\s)+(.)?/g, (m, s, c) => (c ? c.toUpperCase() : ''))
+  return pascaledString.charAt(0).toUpperCase() + pascaledString.slice(1)
+}
+
+async function makeSamTemplate(stackName, accountId, input) {
+  const useYaml = input.yaml
   const path = `sam.${useYaml ? 'yaml' : 'json'}`
-  const templateString = JSON.stringify(samTemplate).replace(/__NAME__/g, resourceSafeName(name))
+  const templateString = JSON.stringify(samTemplate).replace(/__NAME__/g, resourceSafeName(stackName))
   const template = JSON.parse(templateString)
   template.Parameters.bucketName.Default = `sam-uploads-${accountId}`
-  template.Parameters.stackName.Default = name
+  template.Parameters.stackName.Default = stackName
   const content = useYaml ? yaml.safeDump(template) : JSON.stringify(template, null, 2) + '\n'
   await writeFileAsync(path, content, { flag: 'wx' })
   return path
@@ -35,12 +42,11 @@ async function makeLambdaFunction(name) {
   return path
 }
 
-async function init(name, opts) {
+module.exports = async function init(name, input) {
   const stackName = stackSafeName(name)
-  const templatePath = await makeSamTemplate(stackName, opts)
-  const codePath = await makeLambdaFunction(stackName)
-  logSuccess(`Created project: "${stackName}"`)
-  logInfo('template:', templatePath, '| code:', codePath)
+  const accountId = await getAccountId()
+  log.info('Creating project...')
+  const templatePath = await makeSamTemplate(stackName, accountId, input)
+  const codePath = await makeLambdaFunction(name)
+  log.success(`Project created: "${stackName}"`).info('template:', templatePath, '| code:', codePath)
 }
-
-module.exports = init

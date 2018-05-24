@@ -31,6 +31,6 @@
   },
   "scripts": {
     "test": "flt",
-    "clean": "rm -f index.js | rm -f sam.json | rm -f sam.yaml | rm -f sam-packaged.json | rm -f .eslintcache"
+    "clean": "rm -f index.js | rm -f sam*.json | rm -f sam*.yaml | rm -f .eslintcache"
   }
 }
