@@ -3,7 +3,6 @@ const GREEN = '\x1b[32m'
 const YELLOW = '\x1b[33m'
 const RED = '\x1b[31m'
 const RESET = '\x1b[0m'
-const CHECK = `${GREEN}✔︎${RESET}`
 
 function info(...args) {
   console.info(`${CYAN}[sammie]${RESET}`, ...args) // eslint-disable-line no-console
@@ -21,7 +20,8 @@ function command(...args) {
 }
 
 function success(...args) {
-  return info(...args, CHECK)
+  console.info(`${GREEN}[sammie]${RESET}`, ...args, `${GREEN}✔︎${RESET}`) // eslint-disable-line no-console
+  return log
 }
 
 const log = { info, success, error, command }
