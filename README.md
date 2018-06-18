@@ -4,9 +4,9 @@
 
 ### Features
 
-* Generate a minimal yet flexible SAM template for you to get started.
-* Simplify SAM's complex packaging & deploy steps & flags into a simple `deploy` command.
-* Provide a best practice for deploying multiple environments.
+- Generate a minimal yet flexible SAM template for you to get started.
+- Simplify SAM's complex packaging & deploy steps & flags into a simple `deploy` command.
+- Provide a best practice for deploying multiple environments.
 
 ![sammie](https://user-images.githubusercontent.com/411908/35882654-ea43468a-0b52-11e8-9a0c-d5d721e56a51.gif)
 
