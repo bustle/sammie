@@ -66,8 +66,13 @@
   },
 
   "Outputs": {
-    "region": { "Value": { "Ref": "AWS::Region" } },
-    "apiId": { "Value": { "Ref": "__NAME__Api" } },
-    "environment": { "Value": { "Ref": "environment" } }
+    "apiUrl": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          ["https://", { "Ref": "__NAME__Api" }, ".execute-api.", { "Ref": "AWS::Region" }, ".amazonaws.com/", { "Ref": "environment" }]
+        ]
+      }
+    }
   }
 }

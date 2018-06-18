@@ -25,11 +25,6 @@ async function getStackOutputs(stackName) {
   return outputs
 }
 
-async function getEndpointUrl(stackName) {
-  const { apiId, region, environment } = await getStackOutputs(stackName)
-  return apiId && region && environment && `https://${apiId}.execute-api.${region}.amazonaws.com/${environment}`
-}
-
 module.exports = async function deploy(input) {
   await validate(input)
   const { templatePathEnvMerged, templatePathPackaged, environment, parameters } = await packageProject(input)
@@ -39,6 +34,6 @@ module.exports = async function deploy(input) {
   log.success('Deployed')
   deleteFileAsync(templatePathPackaged)
   templatePathEnvMerged && deleteFileAsync(templatePathEnvMerged)
-  const url = await getEndpointUrl(stackName)
-  log.info('Live url:', url)
+  const outputs = await getStackOutputs(stackName)
+  log.info('Live url:', outputs.apiUrl)
 }
