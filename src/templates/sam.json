@@ -67,12 +67,7 @@
 
   "Outputs": {
     "apiUrl": {
-      "Value": {
-        "Fn::Join": [
-          "",
-          ["https://", { "Ref": "__NAME__Api" }, ".execute-api.", { "Ref": "AWS::Region" }, ".amazonaws.com/", { "Ref": "environment" }]
-        ]
-      }
+      "Value": { "Fn::Sub": "https://${__NAME__Api}.execute-api.${AWS::Region}.amazonaws.com/${environment}" }
     }
   }
 }
