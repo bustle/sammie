@@ -58,7 +58,7 @@ E.g. your stack name is "my-app":
 
 #### Environment variables & properties
 
-To add environemnt specific variables & properties, create separate sam templates named with the environemnt suffix.  
+To add environment specific variables & properties, create separate sam templates named with the environment suffix.  
 E.g. `sam-production.json` containing the following, will get merged with your base template `sam.json` upon `sammie deploy --environment production`
 
 ```json
