@@ -8,7 +8,7 @@
 - Simplify SAM's complex packaging & deploy steps & flags into a simple `deploy` command.
 - Provide a best practice for deploying multiple environments.
 
-![sammie](https://user-images.githubusercontent.com/411908/35882654-ea43468a-0b52-11e8-9a0c-d5d721e56a51.gif)
+<p align="center"><img width="750" height="450" src="https://imgix.bustle.com/uploads/image/2018/6/26/a5688b17-aa7f-4317-9778-1d80f83b4274-term-sheet-1530020366285.svg"></p>
 
 ---
 
