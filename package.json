@@ -1,6 +1,6 @@
 {
   "name": "sammie",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Serverless Application Model Made Infinitely Easier",
   "license": "MIT",
   "author": "Garth Poitras <garth22@gmail.com>",
@@ -18,6 +18,9 @@
   ],
   "main": "src/index.js",
   "bin": "src/bin.js",
+  "files": [
+    "src"
+  ],
   "engines": {
     "node": ">=8"
   },
@@ -27,10 +30,10 @@
     "sade": "^1.4.1"
   },
   "devDependencies": {
-    "flt": "^0.3.1"
+    "flt": "^0.4.1"
   },
   "scripts": {
     "test": "flt",
-    "clean": "rm -f index.js | rm -f sam*.json | rm -f sam*.yaml | rm -f .eslintcache"
+    "clean": "rm -f index.js | rm -f sam*.json | rm -f sam*.yaml | rm -f .*cache"
   }
 }
