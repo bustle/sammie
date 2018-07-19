@@ -6,7 +6,8 @@ const validate = require('./commands/validate')
 const packageProject = require('./commands/package')
 
 process.on('unhandledRejection', e => {
-  throw e
+  console.log(e.stack) // eslint-disable-line no-console
+  process.exit(e.errno || 1)
 })
 
 const cli = sade(packageJson.name)
