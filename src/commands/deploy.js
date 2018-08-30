@@ -3,13 +3,13 @@ const packageProject = require('./package')
 const log = require('../log')
 const { spawnAsync, deleteFileAsync } = require('../utils')
 
-async function deployStack(templatePathPackaged, stackName, parameters) {
+async function deployStack(templatePathPackaged, stackName, capabilities, parameters) {
   const parametersFlag = parameters && parameters.length && parameters.join(' ')
   const command =
     `aws cloudformation deploy ` +
     `--template-file ${templatePathPackaged} ` +
     `--stack-name ${stackName} ` +
-    `--capabilities CAPABILITY_IAM ` +
+    `--capabilities ${capabilities || 'CAPABILITY_IAM'} ` +
     `${parametersFlag ? '--parameter-overrides ' + parametersFlag : ''}`
   log.info(`Deploying stack "${stackName}"...`).command(command)
   return spawnAsync(command)
@@ -30,7 +30,7 @@ module.exports = async function deploy(input) {
   const { templatePathEnvMerged, templatePathPackaged, environment, parameters } = await packageProject(input)
   const stackName = `${parameters.stackName.Default}-${environment}`
   const deployParams = [].concat(input.parameters || [], `environment=${environment}`)
-  await deployStack(templatePathPackaged, stackName, deployParams)
+  await deployStack(templatePathPackaged, stackName, input.capabilities, deployParams)
   log.success('Deployed')
   deleteFileAsync(templatePathPackaged)
   templatePathEnvMerged && deleteFileAsync(templatePathEnvMerged)
