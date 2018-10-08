@@ -28,12 +28,9 @@ function filePathWithSuffix(filePath, suffix) {
 }
 
 async function createS3Bucket(bucketName) {
-  const command = `aws s3api create-bucket --bucket ${bucketName}`
+  const command = `aws s3api head-bucket --bucket ${bucketName} &>/dev/null || aws s3 mb s3://${bucketName}`
   log.info('Creating s3 code bucket (if necessary)...').command(command)
-  const data = await spawnAsync(command)
-  const bucketLocation = data.Location
-  if (!bucketLocation) throw Error('Bucket could not be created')
-  return bucketLocation
+  return spawnAsync(command)
 }
 
 async function mergeEnvTemplate(baseTemplatePath, baseTemplateJson, environment) {

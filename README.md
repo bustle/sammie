@@ -44,6 +44,8 @@ _Options:_
 `-e, --environment`: An environment name to deploy. Defaults to "development".  
 `-p, --parameters`: A list of parameters to override in your template.
 
+sammie will automatically create an s3 bucket to upload your code. To change this to a different bucket, change `bucketName` in your `sam.json` template.
+
 ---
 
 ### Environments
