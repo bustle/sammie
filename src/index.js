@@ -4,9 +4,10 @@ const init = require('./commands/init')
 const deploy = require('./commands/deploy')
 const validate = require('./commands/validate')
 const packageProject = require('./commands/package')
+const { error } = require('./log')
 
 process.on('unhandledRejection', e => {
-  console.log(e.stack) // eslint-disable-line no-console
+  error(e.stack) // eslint-disable-line no-console
   process.exit(e.errno || 1)
 })
 

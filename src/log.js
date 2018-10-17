@@ -1,26 +1,23 @@
-const CYAN = '\x1b[36m'
-const GREEN = '\x1b[32m'
-const YELLOW = '\x1b[33m'
-const RED = '\x1b[31m'
-const RESET = '\x1b[0m'
+const { cyan, green, yellow, red } = require('chalk')
+const prefix = '[sammie]'
 
 function info(...args) {
-  console.info(`${CYAN}[sammie]${RESET}`, ...args) // eslint-disable-line no-console
+  console.info(cyan(prefix), ...args) // eslint-disable-line no-console
   return log
 }
 
 function error(...args) {
-  console.error(RED, ...args, RESET) // eslint-disable-line no-console
+  console.error(red(args)) // eslint-disable-line no-console
   return log
 }
 
 function command(...args) {
-  console.log(YELLOW, ...args, RESET) // eslint-disable-line no-console
+  console.log(yellow(args)) // eslint-disable-line no-console
   return log
 }
 
 function success(...args) {
-  console.info(`${GREEN}[sammie]${RESET}`, ...args, `${GREEN}✔︎${RESET}`) // eslint-disable-line no-console
+  console.info(green(prefix), ...args, green('✔︎')) // eslint-disable-line no-console
   return log
 }
 
