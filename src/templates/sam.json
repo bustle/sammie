@@ -33,6 +33,7 @@
       "Type": "AWS::Serverless::Api",
       "Properties": {
         "StageName": { "Ref": "environment" },
+        "MinimumCompressionSize": 1000,
         "DefinitionBody": {
           "swagger": "2.0",
           "info": {
