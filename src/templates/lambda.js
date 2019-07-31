@@ -1,4 +1,4 @@
-const template = (event, context) => {
+exports.handler = async (event, context) => {
   const body = `
     <h1>Hello __NAME__!</h1>
     <details>
@@ -10,7 +10,9 @@ const template = (event, context) => {
       <pre>${JSON.stringify(context, null, 2)}</pre>
     </details>`
 
-  return Promise.resolve({ statusCode: 200, headers: { 'content-type': 'text/html' }, body })
+  return {
+    statusCode: 200,
+    headers: { 'content-type': 'text/html' },
+    body
+  }
 }
-
-module.exports = 'exports.handler = ' + template.toString() + '\n'

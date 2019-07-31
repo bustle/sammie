@@ -9,6 +9,13 @@
     "environment": { "Type": "String", "Default": "development" }
   },
 
+  "Globals": {
+    "Api": {
+      "OpenApiVersion": "3.0",
+      "Cors": "'*'"
+    }
+  },
+
   "Resources": {
     "__NAME__Function": {
       "Type": "AWS::Serverless::Function",
@@ -26,6 +33,7 @@
       "Type": "AWS::Serverless::Api",
       "Properties": {
         "StageName": { "Ref": "environment" },
+        "MinimumCompressionSize": 1000,
         "DefinitionBody": {
           "swagger": "2.0",
           "info": {

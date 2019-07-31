@@ -1,8 +1,8 @@
+const { join } = require('path')
 const yaml = require('js-yaml')
-const { writeFileAsync, spawnAsync } = require('../utils')
+const { readFileAsync, writeFileAsync, spawnAsync } = require('../utils')
 const log = require('../log')
 const samTemplate = require('../templates/sam')
-const lambdaTemplate = require('../templates/lambda')
 
 async function getAccountId() {
   const command = `aws sts get-caller-identity`
@@ -37,8 +37,9 @@ async function makeSamTemplate(stackName, accountId, input) {
 
 async function makeLambdaFunction(name) {
   const path = 'index.js'
-  const func = lambdaTemplate.replace(/__NAME__/g, name)
-  await writeFileAsync(path, func, { flag: 'wx' })
+  const code = await readFileAsync(join(__dirname, '../templates/lambda.js'), 'utf8')
+  const codeWithName = code.replace(/__NAME__/g, name)
+  await writeFileAsync(path, codeWithName, { flag: 'wx' })
   return path
 }
 
@@ -48,5 +49,5 @@ module.exports = async function init(name, input) {
   log.info('Creating project...')
   const templatePath = await makeSamTemplate(stackName, accountId, input)
   const codePath = await makeLambdaFunction(name)
-  log.success(`Created: "${stackName}" -`, 'template:', templatePath, '| code:', codePath)
+  log.success(`Created "${stackName}": ${codePath}, ${templatePath}`)
 }
