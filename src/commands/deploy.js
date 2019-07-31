@@ -35,6 +35,7 @@ module.exports = async function deploy(input) {
   deleteFileAsync(templatePathPackaged)
   templatePathEnvMerged && deleteFileAsync(templatePathEnvMerged)
   const outputs = await getStackOutputs(stackName)
-  const url = `https://${outputs.apiId}.execute-api.${outputs.region}.amazonaws.com/${outputs.environment}`
+  const url =
+    outputs.apiUrl || `https://${outputs.apiId}.execute-api.${outputs.region}.amazonaws.com/${outputs.environment}`
   log.info('Live url:', url)
 }

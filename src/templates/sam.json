@@ -74,5 +74,11 @@
         "Principal": "apigateway.amazonaws.com"
       }
     }
+  },
+
+  "Outputs": {
+    "apiUrl": {
+      "Value": { "Fn::Sub": "https://${__NAME__Api}.execute-api.${AWS::Region}.amazonaws.com/${environment}" }
+    }
   }
 }

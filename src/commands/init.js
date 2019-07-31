@@ -48,5 +48,5 @@ module.exports = async function init(name, input) {
   log.info('Creating project...')
   const templatePath = await makeSamTemplate(stackName, accountId, input)
   const codePath = await makeLambdaFunction(name)
-  log.success(`Created: "${stackName}" -`, 'template:', templatePath, '| code:', codePath)
+  log.success(`Created "${stackName}":`, 'template:', templatePath, ', code:', codePath)
 }
