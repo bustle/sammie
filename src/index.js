@@ -28,6 +28,7 @@ cli
   .option('-t, --template', 'Path to a SAM template. Defaults to `sam.(json|yaml)` in the current directory.')
   .option('-e, --environment', 'An environment name to deploy. Defaults to "development".')
   .option('-p, --parameters', 'A list of parameters to override in your template.')
+  .option('-s, --stack-name', 'Option to override the auto-generated environment stack name.')
   .example('deploy')
   .example('deploy --template ./configs/sam.json --environment production --parameters key1=val1 key2=val2')
   .action(deploy)
