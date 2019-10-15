@@ -26,12 +26,12 @@
   },
   "dependencies": {
     "chalk": "^2.4.2",
-    "deepmerge": "^4.0.0",
+    "deepmerge": "^4.1.1",
     "js-yaml": "^3.13.1",
     "sade": "^1.6.1"
   },
   "devDependencies": {
-    "flt": "^0.15.1"
+    "flt": "^0.17.0"
   },
   "scripts": {
     "test": "flt",
