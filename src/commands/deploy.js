@@ -28,9 +28,8 @@ async function getStackOutputs(stackName) {
 module.exports = async function deploy(input) {
   await validate(input)
   const { templatePathEnvMerged, templatePathPackaged, environment, parameters } = await packageProject(input)
-  const inputParams = input.parameters || []
-  const stackName = inputParams.stackName || `${parameters.stackName.Default}-${environment}`
-  const deployParams = [].concat(inputParams, `environment=${environment}`)
+  const stackName = input['stack-name'] || `${parameters.stackName.Default}-${environment}`
+  const deployParams = [].concat(input.parameters || [], `environment=${environment}`)
   await deployStack(templatePathPackaged, stackName, input.capabilities, deployParams)
   log.success('Deployed')
   deleteFileAsync(templatePathPackaged)
