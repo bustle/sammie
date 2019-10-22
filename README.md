@@ -43,9 +43,10 @@ _Options:_
 `-t, --template`: Path to a SAM template. Defaults to `sam.(json|yaml)` in the current directory.  
 `-e, --environment`: An environment name to deploy. Defaults to "development".  
 `-p, --parameters`: A list of parameters to override in your template.  
-`-s, --stack-name`: Option to override the auto-generated environment stack name.
-
-sammie will automatically create an s3 bucket to upload your code. To change this to a different bucket, change `bucketName` in your `sam.json` template.
+`-s, --stack-name`: Option to override the auto-generated environment stack name.  
+`--s3-bucket`: Name of the S3 bucket where code is uploaded. Defaults to Parameters.bucketName in template.  
+`--s3-prefix`: A prefix name added to the packaged code when uploaded to s3.  
+`--capabilities`, See [`aws cloudformation deploy`](https://docs.aws.amazon.com/cli/latest/reference/cloudformation/deploy/index.html). Defaults to CAPABILITY_IAM.
 
 ---
 
