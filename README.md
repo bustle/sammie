@@ -44,9 +44,8 @@ _Options:_
 `-e, --environment`: An environment name to deploy. Defaults to "development".  
 `-p, --parameters`: A list of parameters to override in your template.  
 `-s, --stack-name`: Option to override the auto-generated environment stack name.  
-`--s3-bucket`: Name of the S3 bucket where code is uploaded. Defaults to Parameters.bucketName in template.  
-`--s3-prefix`: A prefix name added to the packaged code when uploaded to s3.  
-`--capabilities`, See [`aws cloudformation deploy`](https://docs.aws.amazon.com/cli/latest/reference/cloudformation/deploy/index.html). Defaults to CAPABILITY_IAM.
+`--s3-bucket`: S3 bucket where code is uploaded. Defaults to Parameters.bucketName in template.  
+`--s3-prefix`: S3 path prefix added to the packaged code file.
 
 ---
 
