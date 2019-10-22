@@ -60,8 +60,8 @@ module.exports = async function packageProject(input) {
   const environment = input.environment || (parameters.environment && parameters.environment.Default) || 'development'
   const templatePathEnvMerged = await mergeEnvTemplate(templatePath, templateJson, environment)
   const templatePathPackaged = filePathWithSuffix(templatePath, '-packaged')
-  const bucketName = input['s3-bucket'] || parameters.bucketName.Default
-  const bucketPrefix = input['s3-prefix']
+  const bucketName = input['s3-bucket'] || (parameters.bucketName && parameters.bucketName.Default)
+  const bucketPrefix = input['s3-prefix'] || (parameters.s3Prefix && parameters.s3Prefix.Default)
   const command =
     `aws cloudformation package ` +
     `--template-file ${templatePathEnvMerged || templatePath} ` +
