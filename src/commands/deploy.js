@@ -25,15 +25,21 @@ async function getStackOutputs(stackName) {
   return outputs
 }
 
+async function cleanPackagedTemplates(paths) {
+  return Promise.all(paths.filter(Boolean).map(path => deleteFileAsync(path)))
+}
+
 module.exports = async function deploy(input) {
   await validate(input)
   const { templatePathEnvMerged, templatePathPackaged, environment, parameters } = await packageProject(input)
   const stackName = input['stack-name'] || `${parameters.stackName.Default}-${environment}`
   const deployParams = [].concat(input.parameters || [], `environment=${environment}`)
-  await deployStack(templatePathPackaged, stackName, input.capabilities, deployParams)
+  try {
+    await deployStack(templatePathPackaged, stackName, input.capabilities, deployParams)
+  } finally {
+    await cleanPackagedTemplates([templatePathPackaged, templatePathEnvMerged])
+  }
   log.success('Deployed')
-  deleteFileAsync(templatePathPackaged)
-  templatePathEnvMerged && deleteFileAsync(templatePathEnvMerged)
   const outputs = await getStackOutputs(stackName)
   const url =
     outputs.apiUrl || `https://${outputs.apiId}.execute-api.${outputs.region}.amazonaws.com/${outputs.environment}`
