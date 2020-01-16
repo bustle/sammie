@@ -33,7 +33,7 @@ cli
   .option('--s3-prefix', 'S3 path prefix added to the packaged code file. Defaults to stackName/year')
   .option('--capabilities', 'See `aws cloudformation deploy`. Defaults to CAPABILITY_IAM')
   .example('deploy')
-  .example('deploy --template ./configs/sam.json --environment production --parameters key1=val1 key2=val2')
+  .example('deploy --template ./configs/sam.json --environment production -p key1=val1 -p key2=val2')
   .action(deploy)
 
 // ---------------------------------------------------------------------
