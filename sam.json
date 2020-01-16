@@ -1,14 +1,21 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
-
-  "Description": "__NAME__",
+  "Description": "Test1",
   "Parameters": {
-    "stackName": { "Type": "String" },
-    "bucketName": { "Type": "String" },
-    "environment": { "Type": "String", "Default": "development" }
+    "stackName": {
+      "Type": "String",
+      "Default": "test1"
+    },
+    "bucketName": {
+      "Type": "String",
+      "Default": "sam-uploads-123532619935"
+    },
+    "environment": {
+      "Type": "String",
+      "Default": "development"
+    }
   },
-
   "Globals": {
     "Api": {
       "OpenApiVersion": "3.0",
@@ -16,24 +23,26 @@
       "MinimumCompressionSize": 1000
     }
   },
-
   "Resources": {
-    "__NAME__Function": {
+    "Test1Function": {
       "Type": "AWS::Serverless::Function",
       "Properties": {
-        "FunctionName": { "Ref": "AWS::StackName" },
+        "FunctionName": {
+          "Ref": "AWS::StackName"
+        },
         "CodeUri": "index.js",
         "Handler": "index.handler",
         "Runtime": "nodejs12.x",
         "MemorySize": 256,
         "Timeout": 10,
         "Events": {
-          "HttpApiEvent": { "Type": "HttpApi" }
+          "HttpApiEvent": {
+            "Type": "HttpApi"
+          }
         }
       }
     }
   },
-
   "Outputs": {
     "region": { "Value": { "Ref": "AWS::Region" } },
     "apiId": { "Value": { "Ref": "ServerlessHttpApi" } }

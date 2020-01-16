@@ -16,9 +16,8 @@ async function deployStack(templatePathPackaged, stackName, capabilities, parame
 }
 
 async function getStackOutputs(stackName) {
-  const command = `aws cloudformation describe-stacks --stack-name ${stackName}`
-  const data = await spawnAsync(command)
-  const outputs = data.Stacks[0].Outputs.reduce((result, o) => {
+  const data = await spawnAsync(`aws cloudformation describe-stacks --stack-name ${stackName}`)
+  const outputs = (data.Stacks[0].Outputs || []).reduce((result, o) => {
     result[o.OutputKey] = o.OutputValue
     return result
   }, {})
@@ -40,8 +39,6 @@ module.exports = async function deploy(input) {
     await cleanPackagedTemplates([templatePathPackaged, templatePathEnvMerged])
   }
   log.success('Deployed')
-  const outputs = await getStackOutputs(stackName)
-  const url =
-    outputs.apiUrl || `https://${outputs.apiId}.execute-api.${outputs.region}.amazonaws.com/${outputs.environment}`
-  log.info('Live url:', url)
+  const { apiId, region } = await getStackOutputs(stackName)
+  if (apiId && region) log.info('Live url:', `https://${apiId}.execute-api.${region}.amazonaws.com`)
 }
