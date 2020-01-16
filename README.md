@@ -45,7 +45,7 @@ _Options:_
 `-p, --parameters`: A list of parameters to override in your template.  
 `-s, --stack-name`: Option to override the auto-generated environment stack name.  
 `--s3-bucket`: S3 bucket where code is uploaded. Defaults to Parameters.bucketName in template.  
-`--s3-prefix`: S3 path prefix added to the packaged code file.
+`--s3-prefix`: S3 path prefix added to the packaged code file. Defaults to stackName/year.
 
 ---
 
