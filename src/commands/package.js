@@ -58,16 +58,20 @@ module.exports = async function packageProject(input) {
   const templateJson = parseTemplate(templateString, templateExt)
   const parameters = templateJson.Parameters
   const environment = input.environment || (parameters.environment && parameters.environment.Default) || 'development'
+  const stackName = input['stack-name'] || `${parameters.stackName && parameters.stackName.Default}-${environment}`
+  const bucketName = input['s3-bucket'] || (parameters.bucketName && parameters.bucketName.Default)
+  const s3Prefix =
+    input['s3-prefix'] ||
+    (parameters.s3Prefix && parameters.s3Prefix.Default) ||
+    `${stackName}/${new Date().getFullYear()}`
   const templatePathEnvMerged = await mergeEnvTemplate(templatePath, templateJson, environment)
   const templatePathPackaged = filePathWithSuffix(templatePath, '-packaged')
-  const bucketName = input['s3-bucket'] || (parameters.bucketName && parameters.bucketName.Default)
-  const bucketPrefix = input['s3-prefix'] || (parameters.s3Prefix && parameters.s3Prefix.Default)
   const command =
     `aws cloudformation package ` +
     `--template-file ${templatePathEnvMerged || templatePath} ` +
     `--output-template-file ${templatePathPackaged} ` +
     `--s3-bucket ${bucketName}` +
-    `${bucketPrefix ? ' --s3-prefix ' + bucketPrefix : ''}` +
+    `${s3Prefix ? ' --s3-prefix ' + s3Prefix : ''}` +
     `${templateExt === '.json' ? ' --use-json' : ''}`
 
   checkCliVersion()
@@ -75,5 +79,5 @@ module.exports = async function packageProject(input) {
   log.info('Packaging and uploading code...').command(command)
   await spawnAsync(command)
   log.success('Code packaged & uploaded')
-  return { templatePathEnvMerged, templatePathPackaged, environment, parameters }
+  return { templatePathEnvMerged, templatePathPackaged, environment, stackName }
 }

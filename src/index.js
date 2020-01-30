@@ -30,10 +30,10 @@ cli
   .option('-p, --parameters', 'A list of parameters to override in your template.')
   .option('-s, --stack-name', 'Option to override the auto-generated environment stack name')
   .option('--s3-bucket', 'S3 bucket where code is uploaded. Defaults to Parameters.bucketName in template')
-  .option('--s3-prefix', 'S3 path prefix added to the packaged code file')
+  .option('--s3-prefix', 'S3 path prefix added to the packaged code file. Defaults to stackName/year')
   .option('--capabilities', 'See `aws cloudformation deploy`. Defaults to CAPABILITY_IAM')
   .example('deploy')
-  .example('deploy --template ./configs/sam.json --environment production --parameters key1=val1 key2=val2')
+  .example('deploy --template ./configs/sam.json --environment production -p key1=val1 -p key2=val2')
   .action(deploy)
 
 // ---------------------------------------------------------------------
@@ -55,7 +55,7 @@ cli
   .option('-t, --template', 'Path to a SAM template. Defaults to `sam.(json|yaml)` in the current directory')
   .option('-e, --environment', 'An environment name to package. Defaults to "development"')
   .option('--s3-bucket', 'S3 bucket where code is uploaded. Defaults to Parameters.bucketName in template')
-  .option('--s3-prefix', 'S3 path prefix added to the packaged code file')
+  .option('--s3-prefix', 'S3 path prefix added to the packaged code file. Defaults to stackName/year')
   .example('package')
   .example('package --template ./config/sam.json --environment production')
   .action(packageProject)

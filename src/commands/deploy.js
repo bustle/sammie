@@ -30,8 +30,7 @@ async function cleanPackagedTemplates(paths) {
 
 module.exports = async function deploy(input) {
   await validate(input)
-  const { templatePathEnvMerged, templatePathPackaged, environment, parameters } = await packageProject(input)
-  const stackName = input['stack-name'] || `${parameters.stackName.Default}-${environment}`
+  const { templatePathEnvMerged, templatePathPackaged, environment, stackName } = await packageProject(input)
   const deployParams = [].concat(input.parameters || [], `environment=${environment}`)
   try {
     await deployStack(templatePathPackaged, stackName, input.capabilities, deployParams)
