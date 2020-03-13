@@ -1,6 +1,6 @@
 {
   "name": "sammie",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Serverless Application Model Made Infinitely Easier",
   "license": "MIT",
   "author": "Garth Poitras <garth22@gmail.com>",
@@ -31,7 +31,7 @@
     "sade": "^1.7.0"
   },
   "devDependencies": {
-    "flt": "^0.20.0"
+    "flt": "^0.21.0"
   },
   "scripts": {
     "test": "flt",
