@@ -79,5 +79,5 @@ module.exports = async function packageProject(input) {
   log.info('Packaging and uploading code...').command(command)
   await spawnAsync(command)
   log.success('Code packaged & uploaded')
-  return { templatePathEnvMerged, templatePathPackaged, environment, stackName }
+  return { templatePathEnvMerged, templatePathPackaged, environment, stackName, bucketName }
 }
