@@ -29,10 +29,5 @@
         }
       }
     }
-  },
-
-  "Outputs": {
-    "region": { "Value": { "Ref": "AWS::Region" } },
-    "apiId": { "Value": { "Ref": "ServerlessHttpApi" } }
   }
 }

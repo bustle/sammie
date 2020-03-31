@@ -19,13 +19,12 @@ async function deployStack(templatePathPackaged, stackName, bucketName, capabili
   return spawnAsync(command)
 }
 
-async function getStackOutputs(stackName) {
-  const data = await spawnAsync(`aws cloudformation describe-stacks --stack-name ${stackName}`)
-  const outputs = (data.Stacks[0].Outputs || []).reduce((result, o) => {
-    result[o.OutputKey] = o.OutputValue
-    return result
-  }, {})
-  return outputs
+async function getApiUrl(stackName) {
+  const { StackResources } = await spawnAsync(`aws cloudformation describe-stack-resources --stack-name ${stackName}`)
+  const apiInfo = StackResources && StackResources.find(({ ResourceType }) => ResourceType === 'AWS::ApiGatewayV2::Api')
+  const apiId = apiInfo && apiInfo.PhysicalResourceId
+  const region = apiInfo.StackId.split(':')[3]
+  return apiId && region && `https://${apiId}.execute-api.${region}.amazonaws.com`
 }
 
 async function cleanPackagedTemplates(paths) {
@@ -34,16 +33,20 @@ async function cleanPackagedTemplates(paths) {
 
 module.exports = async function deploy(input) {
   await validate(input)
-  const { templatePathEnvMerged, templatePathPackaged, environment, stackName, bucketName } = await packageProject(
-    input
-  )
+
+  const packageResults = await packageProject(input)
+  const { templatePathEnvMerged, templatePathPackaged, environment, stackName, bucketName } = packageResults
+
   const deployParams = [].concat(input.parameters || [], `environment=${environment}`)
   try {
     await deployStack(templatePathPackaged, stackName, bucketName, input.capabilities, deployParams)
+    log.success('Deployed')
   } finally {
-    await cleanPackagedTemplates([templatePathPackaged, templatePathEnvMerged])
+    cleanPackagedTemplates([templatePathPackaged, templatePathEnvMerged])
   }
-  log.success('Deployed')
-  const { apiId, region } = await getStackOutputs(stackName)
-  if (apiId && region) log.info('Live url:', `https://${apiId}.execute-api.${region}.amazonaws.com`)
+
+  try {
+    const apiUrl = await getApiUrl(stackName)
+    if (apiUrl) log.info('Live url:', apiUrl)
+  } catch {}
 }
