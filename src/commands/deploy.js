@@ -30,7 +30,7 @@ async function getStackOutputs(stackName) {
 }
 
 async function cleanPackagedTemplates(paths) {
-  return Promise.all(paths.filter(Boolean).map(path => deleteFileAsync(path)))
+  return Promise.all(paths.filter(Boolean).map((path) => deleteFileAsync(path)))
 }
 
 module.exports = async function deploy(input) {

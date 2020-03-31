@@ -8,10 +8,10 @@ async function spawnAsync(command) {
   const child = spawn(command, { shell: true })
   return new Promise((resolve, reject) => {
     let data = ''
-    child.stdout.on('data', chunk => (data += chunk))
-    child.stderr.on('data', data => log.error(data.toString()))
+    child.stdout.on('data', (chunk) => (data += chunk))
+    child.stderr.on('data', (data) => log.error(data.toString()))
     child.on('error', reject)
-    child.on('exit', code => {
+    child.on('exit', (code) => {
       let response
       try {
         response = JSON.parse(data)
@@ -26,8 +26,8 @@ async function spawnAsync(command) {
 function findTemplatePath(input) {
   if (input.template) return input.template
   const templatePath = ['sam.json', 'sam.yaml']
-    .map(name => relative(process.cwd(), name))
-    .find(path => existsSync(path))
+    .map((name) => relative(process.cwd(), name))
+    .find((path) => existsSync(path))
   if (templatePath) return templatePath
   throw Error('Template not found')
 }

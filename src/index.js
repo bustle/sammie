@@ -6,7 +6,7 @@ const validate = require('./commands/validate')
 const packageProject = require('./commands/package')
 const { error } = require('./log')
 
-process.on('unhandledRejection', e => {
+process.on('unhandledRejection', (e) => {
   error(e.stack) // eslint-disable-line no-console
   process.exit(e.errno || 1)
 })

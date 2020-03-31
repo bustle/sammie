@@ -28,13 +28,14 @@
     "chalk": "^3.0.0",
     "deepmerge": "^4.2.2",
     "js-yaml": "^3.13.1",
-    "sade": "^1.7.0"
+    "sade": "^1.7.3"
   },
   "devDependencies": {
-    "flt": "^0.21.0"
+    "flt": "^0.24.0"
   },
   "scripts": {
     "test": "flt",
     "clean": "rm -f index.js | rm -f sam*.json | rm -f sam*.yaml | rm -f .*cache"
-  }
+  },
+  "prettier": "flt/config/prettier.config.js"
 }
