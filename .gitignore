@@ -56,3 +56,7 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# local usage testing
+sam*.json
+index.js

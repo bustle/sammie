@@ -9,13 +9,6 @@
     "environment": { "Type": "String", "Default": "development" }
   },
 
-  "Globals": {
-    "Api": {
-      "OpenApiVersion": "3.0",
-      "Cors": "'*'"
-    }
-  },
-
   "Resources": {
     "__NAME__Function": {
       "Type": "AWS::Serverless::Function",
@@ -25,61 +18,16 @@
         "Handler": "index.handler",
         "Runtime": "nodejs12.x",
         "MemorySize": 256,
-        "Timeout": 10
-      }
-    },
-
-    "__NAME__Api": {
-      "Type": "AWS::Serverless::Api",
-      "Properties": {
-        "StageName": { "Ref": "environment" },
-        "MinimumCompressionSize": 1000,
-        "DefinitionBody": {
-          "swagger": "2.0",
-          "info": {
-            "title": { "Ref": "AWS::StackName" }
-          },
-          "paths": {
-            "/": {
-              "x-amazon-apigateway-any-method": {
-                "x-amazon-apigateway-integration": {
-                  "type": "aws_proxy",
-                  "httpMethod": "POST",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__NAME__Function.Arn}/invocations"
-                  }
-                }
-              }
-            },
-            "/{proxy+}": {
-              "x-amazon-apigateway-any-method": {
-                "x-amazon-apigateway-integration": {
-                  "type": "aws_proxy",
-                  "httpMethod": "POST",
-                  "uri": {
-                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__NAME__Function.Arn}/invocations"
-                  }
-                }
-              }
+        "Timeout": 10,
+        "Events": {
+          "HttpApiEvent": {
+            "Type": "HttpApi",
+            "Properties": {
+              "PayloadFormatVersion": "2.0"
             }
           }
         }
       }
-    },
-
-    "__NAME__Permission": {
-      "Type": "AWS::Lambda::Permission",
-      "Properties": {
-        "Action": "lambda:InvokeFunction",
-        "FunctionName": { "Ref": "__NAME__Function" },
-        "Principal": "apigateway.amazonaws.com"
-      }
-    }
-  },
-
-  "Outputs": {
-    "apiUrl": {
-      "Value": { "Fn::Sub": "https://${__NAME__Api}.execute-api.${AWS::Region}.amazonaws.com/${environment}" }
     }
   }
 }
