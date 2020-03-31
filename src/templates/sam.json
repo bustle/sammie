@@ -20,7 +20,12 @@
         "MemorySize": 256,
         "Timeout": 10,
         "Events": {
-          "HttpApiEvent": { "Type": "HttpApi" }
+          "HttpApiEvent": {
+            "Type": "HttpApi",
+            "Properties": {
+              "PayloadFormatVersion": "2.0"
+            }
+          }
         }
       }
     }
