@@ -22,7 +22,7 @@
     "src"
   ],
   "engines": {
-    "node": ">=8"
+    "node": ">=10"
   },
   "dependencies": {
     "chalk": "^3.0.0",
