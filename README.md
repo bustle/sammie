@@ -8,8 +8,6 @@
 - Simplify SAM's complex packaging & deploy steps & flags into a simple `deploy` command.
 - Provide a best practice for deploying multiple environments.
 
-<p align="center"><img width="750" height="450" src="https://imgix.bustle.com/uploads/image/2018/6/26/a5688b17-aa7f-4317-9778-1d80f83b4274-term-sheet-1530020366285.svg"></p>
-
 ---
 
 ### Prerequisites
@@ -24,7 +22,7 @@ sammie init my-app
 sammie deploy
 ```
 
-This will generate a basic serverless application, deploy it to a development environment, and direct you to your app served over https!
+This will generate a serverless application, deploy it to a development environment, and direct you to your app served over https!
 
 ---
 
@@ -44,7 +42,7 @@ _Options:_
 `-e, --environment`: An environment name to deploy. Defaults to "development".  
 `-p, --parameters`: A list of parameters to override in your template.  
 `-s, --stack-name`: Option to override the auto-generated environment stack name.  
-`--s3-bucket`: S3 bucket where code is uploaded. Defaults to Parameters.bucketName in template.  
+`--s3-bucket`: S3 bucket where code is uploaded. Defaults to Parameters.bucketName in template which is generated for you.  
 `--s3-prefix`: S3 path prefix added to the packaged code file. Defaults to stackName/year.
 
 ---
@@ -61,8 +59,8 @@ E.g. your stack name is "my-app":
 
 #### Environment variables & properties
 
-To add environment specific variables & properties, create separate sam templates named with the environment suffix.  
-E.g. `sam-production.json` containing the following, will get merged with your base template `sam.json` upon `sammie deploy --environment production`
+To help add environment specific variables & properties, you can create separate SAM templates named with the environment suffix.  
+E.g. `sam-production.json` containing the following, will get _merged with your base template_ `sam.json` upon `sammie deploy --environment production`
 
 ```json
 {
