@@ -40,15 +40,15 @@ async function mergeEnvTemplate(baseTemplatePath, baseTemplateJson, environment)
   try {
     enviromentTemplateString = await readFileAsync(environmentTemplatePath, 'utf8')
   } catch (e) {
-    return
+    return [baseTemplatePath, baseTemplateJson]
   }
   log.info(`Merging ${environment} template (${environmentTemplatePath}) with base template (${baseTemplatePath})`)
   const enviromentTemplateJson = parseTemplate(enviromentTemplateString, templateExt)
   const mergedTemplateJson = deepmerge(baseTemplateJson, enviromentTemplateJson)
   const mergedTemplateString = serializeTemplate(mergedTemplateJson, templateExt)
-  const templatePathEnvMerged = filePathWithSuffix(baseTemplatePath, `-${environment}-merged`)
-  await writeFileAsync(templatePathEnvMerged, mergedTemplateString)
-  return { templatePathEnvMerged, mergedTemplateJson }
+  const mergedTemplatePath = filePathWithSuffix(baseTemplatePath, `-${environment}-merged`)
+  await writeFileAsync(mergedTemplatePath, mergedTemplateString)
+  return [mergedTemplatePath, mergedTemplateJson]
 }
 
 module.exports = async function packageProject(input) {
@@ -57,7 +57,7 @@ module.exports = async function packageProject(input) {
   const templateExt = extname(templatePath)
   const templateJson = parseTemplate(templateString, templateExt)
   const environment = input.environment || 'development'
-  const { templatePathEnvMerged, mergedTemplateJson } = await mergeEnvTemplate(templatePath, templateJson, environment)
+  const [templatePathEnvMerged, mergedTemplateJson] = await mergeEnvTemplate(templatePath, templateJson, environment)
   const templatePathPackaged = filePathWithSuffix(templatePath, '-packaged')
   const parameters = mergedTemplateJson.Parameters
   const stackName = input['stack-name'] || `${parameters.stackName && parameters.stackName.Default}-${environment}`
@@ -68,7 +68,7 @@ module.exports = async function packageProject(input) {
     `${stackName}/${new Date().getFullYear()}`
   const command =
     `aws cloudformation package ` +
-    `--template-file ${templatePathEnvMerged || templatePath} ` +
+    `--template-file ${templatePathEnvMerged} ` +
     `--output-template-file ${templatePathPackaged} ` +
     `--s3-bucket ${bucketName}` +
     `${s3Prefix ? ' --s3-prefix ' + s3Prefix : ''}` +
