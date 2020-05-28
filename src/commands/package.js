@@ -46,9 +46,9 @@ async function mergeEnvTemplate(baseTemplatePath, baseTemplateJson, environment)
   const enviromentTemplateJson = parseTemplate(enviromentTemplateString, templateExt)
   const mergedTemplateJson = deepmerge(baseTemplateJson, enviromentTemplateJson)
   const mergedTemplateString = serializeTemplate(mergedTemplateJson, templateExt)
-  const mergedTemplatePath = filePathWithSuffix(baseTemplatePath, `-${environment}-merged`)
-  await writeFileAsync(mergedTemplatePath, mergedTemplateString)
-  return mergedTemplatePath
+  const templatePathEnvMerged = filePathWithSuffix(baseTemplatePath, `-${environment}-merged`)
+  await writeFileAsync(templatePathEnvMerged, mergedTemplateString)
+  return { templatePathEnvMerged, mergedTemplateJson }
 }
 
 module.exports = async function packageProject(input) {
@@ -57,11 +57,8 @@ module.exports = async function packageProject(input) {
   const templateExt = extname(templatePath)
   const templateJson = parseTemplate(templateString, templateExt)
   const environment = input.environment || (parameters.environment && parameters.environment.Default) || 'development'
-
-  const templatePathEnvMerged = await mergeEnvTemplate(templatePath, templateJson, environment)
+  const { templatePathEnvMerged, mergedTemplateJson } = await mergeEnvTemplate(templatePath, templateJson, environment)
   const templatePathPackaged = filePathWithSuffix(templatePath, '-packaged')
-  const mergedTemplateJson = parseTemplate(await readFileAsync(templatePathEnvMerged, 'utf8'), templateExt)
-
   const parameters = mergedTemplateJson.Parameters
   const stackName = input['stack-name'] || `${parameters.stackName && parameters.stackName.Default}-${environment}`
   const bucketName = input['s3-bucket'] || (parameters.bucketName && parameters.bucketName.Default)
