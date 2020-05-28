@@ -40,7 +40,7 @@ async function mergeEnvTemplate(baseTemplatePath, baseTemplateJson, environment)
   try {
     enviromentTemplateString = await readFileAsync(environmentTemplatePath, 'utf8')
   } catch (e) {
-    return
+    return [baseTemplatePath, baseTemplateJson]
   }
   log.info(`Merging ${environment} template (${environmentTemplatePath}) with base template (${baseTemplatePath})`)
   const enviromentTemplateJson = parseTemplate(enviromentTemplateString, templateExt)
@@ -48,7 +48,7 @@ async function mergeEnvTemplate(baseTemplatePath, baseTemplateJson, environment)
   const mergedTemplateString = serializeTemplate(mergedTemplateJson, templateExt)
   const mergedTemplatePath = filePathWithSuffix(baseTemplatePath, `-${environment}-merged`)
   await writeFileAsync(mergedTemplatePath, mergedTemplateString)
-  return mergedTemplatePath
+  return [mergedTemplatePath, mergedTemplateJson]
 }
 
 module.exports = async function packageProject(input) {
@@ -56,19 +56,19 @@ module.exports = async function packageProject(input) {
   const templateString = await readFileAsync(templatePath, 'utf8')
   const templateExt = extname(templatePath)
   const templateJson = parseTemplate(templateString, templateExt)
-  const parameters = templateJson.Parameters
-  const environment = input.environment || (parameters.environment && parameters.environment.Default) || 'development'
+  const environment = input.environment || 'development'
+  const [templatePathEnvMerged, mergedTemplateJson] = await mergeEnvTemplate(templatePath, templateJson, environment)
+  const templatePathPackaged = filePathWithSuffix(templatePath, '-packaged')
+  const parameters = mergedTemplateJson.Parameters
   const stackName = input['stack-name'] || `${parameters.stackName && parameters.stackName.Default}-${environment}`
   const bucketName = input['s3-bucket'] || (parameters.bucketName && parameters.bucketName.Default)
   const s3Prefix =
     input['s3-prefix'] ||
     (parameters.s3Prefix && parameters.s3Prefix.Default) ||
     `${stackName}/${new Date().getFullYear()}`
-  const templatePathEnvMerged = await mergeEnvTemplate(templatePath, templateJson, environment)
-  const templatePathPackaged = filePathWithSuffix(templatePath, '-packaged')
   const command =
     `aws cloudformation package ` +
-    `--template-file ${templatePathEnvMerged || templatePath} ` +
+    `--template-file ${templatePathEnvMerged} ` +
     `--output-template-file ${templatePathPackaged} ` +
     `--s3-bucket ${bucketName}` +
     `${s3Prefix ? ' --s3-prefix ' + s3Prefix : ''}` +
