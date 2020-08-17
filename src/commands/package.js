@@ -3,7 +3,7 @@ const { basename, extname, dirname, join } = require('path')
 const yaml = require('js-yaml')
 const deepmerge = require('deepmerge')
 const log = require('../log')
-const { findTemplatePath, spawnAsync, readFileAsync, writeFileAsync } = require('../utils')
+const { findTemplatePath, spawnAsync, readFileAsync, writeFileAsync, deleteFileAsync } = require('../utils')
 
 // Older versions of aws cli don't support json for `aws cloudformation package`
 function checkCliVersion() {
@@ -40,7 +40,7 @@ async function mergeEnvTemplate(baseTemplatePath, baseTemplateJson, environment)
   try {
     enviromentTemplateString = await readFileAsync(environmentTemplatePath, 'utf8')
   } catch (e) {
-    return [baseTemplatePath, baseTemplateJson]
+    return []
   }
   log.info(`Merging ${environment} template (${environmentTemplatePath}) with base template (${baseTemplatePath})`)
   const enviromentTemplateJson = parseTemplate(enviromentTemplateString, templateExt)
@@ -57,9 +57,11 @@ module.exports = async function packageProject(input) {
   const templateExt = extname(templatePath)
   const templateJson = parseTemplate(templateString, templateExt)
   const environment = input.environment || 'development'
-  const [templatePathEnvMerged, mergedTemplateJson] = await mergeEnvTemplate(templatePath, templateJson, environment)
+  const [templatePathEnvMerged, templateJsonEnvMerged] = await mergeEnvTemplate(templatePath, templateJson, environment)
+  const resolvedTemplatePath = templatePathEnvMerged || templatePath
+  const resolvedTemplateJson = templateJsonEnvMerged || templateJson
   const templatePathPackaged = filePathWithSuffix(templatePath, '-packaged')
-  const parameters = mergedTemplateJson.Parameters
+  const parameters = resolvedTemplateJson.Parameters
   const stackName = input['stack-name'] || `${parameters.stackName && parameters.stackName.Default}-${environment}`
   const bucketName = input['s3-bucket'] || (parameters.bucketName && parameters.bucketName.Default)
   const s3Prefix =
@@ -68,7 +70,7 @@ module.exports = async function packageProject(input) {
     `${stackName}/${new Date().getFullYear()}`
   const command =
     `aws cloudformation package ` +
-    `--template-file ${templatePathEnvMerged} ` +
+    `--template-file ${resolvedTemplatePath} ` +
     `--output-template-file ${templatePathPackaged} ` +
     `--s3-bucket ${bucketName}` +
     `${s3Prefix ? ' --s3-prefix ' + s3Prefix : ''}` +
@@ -78,6 +80,7 @@ module.exports = async function packageProject(input) {
   await createS3Bucket(bucketName)
   log.info('Packaging and uploading code...').command(command)
   await spawnAsync(command)
+  if (templatePathEnvMerged) await deleteFileAsync(templatePathEnvMerged)
   log.success('Code packaged & uploaded')
-  return { templatePathEnvMerged, templatePathPackaged, environment, stackName, bucketName }
+  return { templatePathPackaged, environment, stackName, bucketName }
 }

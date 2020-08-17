@@ -27,22 +27,18 @@ async function getApiUrl(stackName) {
   return apiId && region && `https://${apiId}.execute-api.${region}.amazonaws.com`
 }
 
-async function cleanPackagedTemplates(paths) {
-  return Promise.all(paths.filter(Boolean).map((path) => deleteFileAsync(path)))
-}
-
 module.exports = async function deploy(input) {
   await validate(input)
 
   const packageResults = await packageProject(input)
-  const { templatePathEnvMerged, templatePathPackaged, environment, stackName, bucketName } = packageResults
+  const { templatePathPackaged, environment, stackName, bucketName } = packageResults
 
   const deployParams = [].concat(input.parameters || [], `environment=${environment}`)
   try {
     await deployStack(templatePathPackaged, stackName, bucketName, input.capabilities, deployParams)
     log.success('Deployed')
   } finally {
-    cleanPackagedTemplates([templatePathPackaged, templatePathEnvMerged])
+    await deleteFileAsync(templatePathPackaged)
   }
 
   try {
