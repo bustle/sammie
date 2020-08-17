@@ -27,13 +27,19 @@ async function getApiUrl(stackName) {
   return apiId && region && `https://${apiId}.execute-api.${region}.amazonaws.com`
 }
 
+async function getStackOutputs(stackName) {
+  return await spawnAsync(
+    `aws cloudformation describe-stacks --stack-name ${stackName} --query Stacks[0].Outputs[*] --output text`
+  )
+}
+
 module.exports = async function deploy(input) {
   await validate(input)
 
   const packageResults = await packageProject(input)
   const { templatePathPackaged, environment, stackName, bucketName } = packageResults
-
   const deployParams = [].concat(input.parameters || [], `environment=${environment}`)
+
   try {
     await deployStack(templatePathPackaged, stackName, bucketName, input.capabilities, deployParams)
     log.success('Deployed')
@@ -41,8 +47,11 @@ module.exports = async function deploy(input) {
     deleteFileAsync(templatePathPackaged)
   }
 
-  try {
+  if (input.outputs) {
+    const outputs = await getStackOutputs(stackName)
+    log.info('Outputs:').raw(outputs)
+  } else {
     const apiUrl = await getApiUrl(stackName)
     if (apiUrl) log.info('Live url:', apiUrl)
-  } catch {}
+  }
 }

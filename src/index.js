@@ -32,6 +32,7 @@ cli
   .option('--s3-bucket', 'S3 bucket where code is uploaded. Defaults to Parameters.bucketName in template')
   .option('--s3-prefix', 'S3 path prefix added to the packaged code file. Defaults to stackName/year')
   .option('--capabilities', 'See `aws cloudformation deploy`. Defaults to CAPABILITY_IAM')
+  .option('-o, --outputs', `Prints the stack's outputs to the console`)
   .example('deploy')
   .example('deploy --template ./configs/sam.json --environment production -p key1=val1 -p key2=val2')
   .action(deploy)

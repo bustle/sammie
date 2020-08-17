@@ -44,6 +44,7 @@ _Options:_
 `-s, --stack-name`: Option to override the auto-generated environment stack name.  
 `--s3-bucket`: S3 bucket where code is uploaded. Defaults to Parameters.bucketName in template which is generated for you.  
 `--s3-prefix`: S3 path prefix added to the packaged code file. Defaults to stackName/year.
+`-o, --outputs`: Prints the stack's outputs to the console.
 
 ---
 
