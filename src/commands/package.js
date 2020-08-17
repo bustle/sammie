@@ -80,7 +80,7 @@ module.exports = async function packageProject(input) {
   await createS3Bucket(bucketName)
   log.info('Packaging and uploading code...').command(command)
   await spawnAsync(command)
-  if (templatePathEnvMerged) await deleteFileAsync(templatePathEnvMerged)
   log.success('Code packaged & uploaded')
+  if (templatePathEnvMerged) deleteFileAsync(templatePathEnvMerged)
   return { templatePathPackaged, environment, stackName, bucketName }
 }

@@ -38,7 +38,7 @@ module.exports = async function deploy(input) {
     await deployStack(templatePathPackaged, stackName, bucketName, input.capabilities, deployParams)
     log.success('Deployed')
   } finally {
-    await deleteFileAsync(templatePathPackaged)
+    deleteFileAsync(templatePathPackaged)
   }
 
   try {
