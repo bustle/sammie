@@ -25,13 +25,13 @@
     "node": ">=10"
   },
   "dependencies": {
-    "chalk": "^4.0.0",
+    "chalk": "^4.1.0",
     "deepmerge": "^4.2.2",
-    "js-yaml": "^3.13.1",
+    "js-yaml": "^3.14.0",
     "sade": "^1.7.3"
   },
   "devDependencies": {
-    "flt": "^0.26.0"
+    "flt": "^0.32.0"
   },
   "scripts": {
     "test": "flt",
