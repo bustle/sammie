@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "chalk": "^4.1.0",
+    "cloudformation-schema-js-yaml": "^1.0.1",
     "deepmerge": "^4.2.2",
     "js-yaml": "^3.14.0",
     "sade": "^1.7.3"

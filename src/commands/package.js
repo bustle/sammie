@@ -1,6 +1,7 @@
 const { execSync } = require('child_process')
 const { basename, extname, dirname, join } = require('path')
 const yaml = require('js-yaml')
+const schema = require('cloudformation-schema-js-yaml')
 const deepmerge = require('deepmerge')
 const log = require('../log')
 const { findTemplatePath, spawnAsync, readFileAsync, writeFileAsync, deleteFileAsync } = require('../utils')
@@ -13,12 +14,12 @@ function checkCliVersion() {
 
 function parseTemplate(templateString, templateExt) {
   const useJson = templateExt === '.json'
-  return useJson ? JSON.parse(templateString) : yaml.safeLoad(templateString)
+  return useJson ? JSON.parse(templateString) : yaml.safeLoad(templateString, { schema })
 }
 
 function serializeTemplate(templateJson, templateExt) {
   const useJson = templateExt === '.json'
-  return useJson ? JSON.stringify(templateJson, null, 2) : yaml.safeDump(templateJson)
+  return useJson ? JSON.stringify(templateJson, null, 2) : yaml.safeDump(templateJson, { schema })
 }
 
 function filePathWithSuffix(filePath, suffix) {
