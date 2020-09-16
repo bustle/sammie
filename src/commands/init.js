@@ -1,5 +1,6 @@
 const { join } = require('path')
 const yaml = require('js-yaml')
+const schema = require('cloudformation-schema-js-yaml')
 const { readFileAsync, writeFileAsync, spawnAsync } = require('../utils')
 const log = require('../log')
 const samTemplate = require('../templates/sam')
@@ -30,7 +31,7 @@ async function makeSamTemplate(stackName, accountId, input) {
   const template = JSON.parse(templateString)
   template.Parameters.bucketName.Default = `sam-uploads-${accountId}`
   template.Parameters.stackName.Default = stackName
-  const content = useYaml ? yaml.safeDump(template) : JSON.stringify(template, null, 2) + '\n'
+  const content = useYaml ? yaml.safeDump(template, { schema }) : JSON.stringify(template, null, 2) + '\n'
   await writeFileAsync(path, content, { flag: 'wx' })
   return path
 }
